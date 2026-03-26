@@ -1,4 +1,4 @@
-module vmaf-gui
+module VMAF-GUI
 
 go 1.25.4
 

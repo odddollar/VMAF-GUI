@@ -1,13 +1,13 @@
 package main
 
 import (
+	"VMAF-GUI/ui"
 	"bufio"
 	"bytes"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
-	"vmaf-gui/ui"
 )
 
 type Progress struct {

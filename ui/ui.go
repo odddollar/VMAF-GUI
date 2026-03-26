@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"VMAF-GUI/ffmpeg"
+	"errors"
 	"image/color"
 
 	"fyne.io/fyne/v2"
@@ -80,7 +82,19 @@ func (u *Ui) NewUI() {
 func (u *Ui) Run() {
 	u.w.Resize(fyne.NewSize(800, 600))
 	u.w.Show()
+	u.startupChecks()
 	u.a.Run()
+}
+
+// Runs checks to ensure program can run properly
+func (u *Ui) startupChecks() {
+	if !ffmpeg.FFmpegAvailable() {
+		u.showError(errors.New("unable to find FFmpeg"), true)
+	}
+
+	if !ffmpeg.VMAFAvailable() {
+		u.showError(errors.New("unable to find VMAF in FFmpeg"), true)
+	}
 }
 
 // Disables start button if paths are invalid
