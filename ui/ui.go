@@ -42,8 +42,8 @@ func (u *Ui) NewUI() {
 	u.distortedEntry.Validator = validateFileExists
 
 	// Create file explore buttons
-	u.referenceButton = widget.NewButton("...", func() {})
-	u.distortedButton = widget.NewButton("...", func() {})
+	u.referenceButton = widget.NewButton("...", func() { u.selectFile(u.referenceEntry) })
+	u.distortedButton = widget.NewButton("...", func() { u.selectFile(u.distortedEntry) })
 
 	// Create start button
 	u.startButton = widget.NewButton("Run", func() {})
@@ -71,7 +71,7 @@ func (u *Ui) NewUI() {
 }
 
 func (u *Ui) Run() {
-	u.w.Resize(fyne.NewSize(600, 800))
+	u.w.Resize(fyne.NewSize(800, 600))
 	u.w.Show()
 	u.a.Run()
 }
