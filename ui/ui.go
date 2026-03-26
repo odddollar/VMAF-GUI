@@ -38,8 +38,14 @@ func (u *Ui) NewUI() {
 	// Create file path widgets
 	u.referenceEntry = widget.NewEntry()
 	u.referenceEntry.Validator = validateFileExists
+	u.referenceEntry.OnChanged = func(s string) {
+		u.validatePathEntries()
+	}
 	u.distortedEntry = widget.NewEntry()
 	u.distortedEntry.Validator = validateFileExists
+	u.distortedEntry.OnChanged = func(s string) {
+		u.validatePathEntries()
+	}
 
 	// Create file explore buttons
 	u.referenceButton = widget.NewButton("...", func() { u.selectFile(u.referenceEntry) })
@@ -48,6 +54,7 @@ func (u *Ui) NewUI() {
 	// Create start button
 	u.startButton = widget.NewButton("Run", func() {})
 	u.startButton.Importance = widget.HighImportance
+	u.startButton.Disable()
 
 	// Create window layout and set content
 	u.w.SetContent(container.NewVBox(
@@ -74,4 +81,16 @@ func (u *Ui) Run() {
 	u.w.Resize(fyne.NewSize(800, 600))
 	u.w.Show()
 	u.a.Run()
+}
+
+// Disables start button if paths are invalid
+func (u *Ui) validatePathEntries() {
+	referenceErr := u.referenceEntry.Validate()
+	distortedErr := u.distortedEntry.Validate()
+
+	if referenceErr == nil && distortedErr == nil {
+		fyne.Do(func() { u.startButton.Enable() })
+	} else {
+		fyne.Do(func() { u.startButton.Disable() })
+	}
 }

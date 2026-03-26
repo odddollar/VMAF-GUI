@@ -29,6 +29,13 @@ func (u *Ui) selectFile(target *widget.Entry) {
 		target.SetText(reader.URI().Path())
 	}, u.w)
 
+	// Filter for video file types
+	d.SetFilter(storage.NewExtensionFileFilter([]string{
+		".mp4", ".mkv", ".avi", ".mov", ".wmv",
+		".flv", ".webm", ".mpeg", ".mpg", ".m4v",
+		".3gp", ".ogv", ".ts", ".mts", ".vob",
+	}))
+
 	// Open to current directory
 	// Should fallback to user directory
 	cwd, err := os.Getwd()
