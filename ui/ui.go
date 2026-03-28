@@ -9,6 +9,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -23,7 +24,9 @@ type Ui struct {
 	distortedEntry  *widget.Entry
 	referenceButton *widget.Button
 	distortedButton *widget.Button
-	startButton     *widget.Button
+
+	// Proccess tab elements
+	startButton *widget.Button
 }
 
 func (u *Ui) NewUI() {
@@ -50,16 +53,16 @@ func (u *Ui) NewUI() {
 	}
 
 	// Create file explore buttons
-	u.referenceButton = widget.NewButton("...", func() { u.selectFile(u.referenceEntry) })
-	u.distortedButton = widget.NewButton("...", func() { u.selectFile(u.distortedEntry) })
+	u.referenceButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile(u.referenceEntry) })
+	u.distortedButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile(u.distortedEntry) })
 
 	// Create start button
 	u.startButton = widget.NewButton("Run", func() {})
 	u.startButton.Importance = widget.HighImportance
 	u.startButton.Disable()
 
-	// Create window layout and set content
-	u.w.SetContent(container.NewVBox(
+	// Top main UI elements
+	topElements := container.NewVBox(
 		u.titleLabel,
 		widget.NewForm(
 			widget.NewFormItem("Reference file",
@@ -75,7 +78,20 @@ func (u *Ui) NewUI() {
 				),
 			),
 		),
+	)
+
+	// Process tab elements
+	processTabElements := container.NewVBox(
 		u.startButton,
+	)
+
+	// Create window layout and set content
+	u.w.SetContent(container.NewVBox(
+		topElements,
+		container.NewAppTabs(
+			container.NewTabItemWithIcon("Process", theme.MediaPlayIcon(), processTabElements),
+			container.NewTabItemWithIcon("Compare", theme.VisibilityIcon(), container.NewVBox()),
+		),
 	))
 }
 
@@ -90,10 +106,12 @@ func (u *Ui) Run() {
 func (u *Ui) startupChecks() {
 	if !ffmpeg.FFmpegAvailable() {
 		u.showError(errors.New("unable to find FFmpeg"), true)
+		return
 	}
 
 	if !ffmpeg.VMAFAvailable() {
 		u.showError(errors.New("unable to find VMAF in FFmpeg"), true)
+		return
 	}
 }
 
