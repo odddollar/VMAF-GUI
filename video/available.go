@@ -1,7 +1,6 @@
 package video
 
 import (
-	"bytes"
 	"os/exec"
 	"strings"
 )
@@ -16,14 +15,12 @@ func CommandAvailable(command string) bool {
 func VMAFAvailable() bool {
 	cmd := exec.Command("ffmpeg", "-filters")
 
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &out
-
-	if err := cmd.Run(); err != nil {
+	// Get command output
+	out, err := cmd.Output()
+	if err != nil {
 		return false
 	}
 
 	// Look for libvmaf filter in output
-	return strings.Contains(out.String(), "libvmaf")
+	return strings.Contains(string(out), "libvmaf")
 }

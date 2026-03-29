@@ -60,7 +60,7 @@ func (u *Ui) NewUI() {
 	u.distortedButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile(u.distortedEntry) })
 
 	// Create start button
-	u.startButton = widget.NewButton("Run", func() {})
+	u.startButton = widget.NewButton("Run", u.run)
 	u.startButton.Importance = widget.HighImportance
 	u.startButton.Disable()
 
