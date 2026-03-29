@@ -24,9 +24,12 @@ type Ui struct {
 	distortedEntry  *widget.Entry
 	referenceButton *widget.Button
 	distortedButton *widget.Button
+	startButton     *widget.Button
+	progressBar     *widget.ProgressBar
 
-	// Proccess tab elements
-	startButton *widget.Button
+	// Results tab elements
+
+	// Compare tab elements
 }
 
 func (u *Ui) NewUI() {
@@ -61,6 +64,9 @@ func (u *Ui) NewUI() {
 	u.startButton.Importance = widget.HighImportance
 	u.startButton.Disable()
 
+	// Create progress bar
+	u.progressBar = widget.NewProgressBar()
+
 	// Top main UI elements
 	topElements := container.NewVBox(
 		u.titleLabel,
@@ -78,19 +84,22 @@ func (u *Ui) NewUI() {
 				),
 			),
 		),
+		u.startButton,
+		u.progressBar,
 	)
 
-	// Process tab elements
-	processTabElements := container.NewVBox(
-		u.startButton,
-	)
+	// Results tab elements
+	resultsTabElements := container.NewVBox()
+
+	// Compare tab elements
+	compareTabElements := container.NewVBox()
 
 	// Create window layout and set content
 	u.w.SetContent(container.NewVBox(
 		topElements,
 		container.NewAppTabs(
-			container.NewTabItemWithIcon("Process", theme.MediaPlayIcon(), processTabElements),
-			container.NewTabItemWithIcon("Compare", theme.VisibilityIcon(), container.NewVBox()),
+			container.NewTabItemWithIcon("Results", theme.ListIcon(), resultsTabElements),
+			container.NewTabItemWithIcon("Compare", theme.VisibilityIcon(), compareTabElements),
 		),
 	))
 }
