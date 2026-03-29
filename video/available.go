@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-// Check if ffmpeg command is available
-func FFmpegAvailable() bool {
-	_, err := exec.LookPath("ffmpeg")
+// Check if given command is available
+func CommandAvailable(command string) bool {
+	_, err := exec.LookPath(command)
 	return err == nil
 }
 

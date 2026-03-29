@@ -113,13 +113,18 @@ func (u *Ui) Run() {
 
 // Runs checks to ensure program can run properly
 func (u *Ui) startupChecks() {
-	if !video.FFmpegAvailable() {
+	if !video.CommandAvailable("ffmpeg") {
 		u.showError(errors.New("unable to find FFmpeg"), true)
 		return
 	}
 
 	if !video.VMAFAvailable() {
 		u.showError(errors.New("unable to find VMAF in FFmpeg"), true)
+		return
+	}
+
+	if !video.CommandAvailable("ffprobe") {
+		u.showError(errors.New("unable to find FFprobe"), true)
 		return
 	}
 }
