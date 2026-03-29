@@ -12,7 +12,7 @@ import (
 // Contains progress information from ffmpeg output
 type Progress struct {
 	Frame   int
-	FPS     float64
+	FPS     int
 	Time    time.Duration
 	Speed   float64
 	Elapsed time.Duration

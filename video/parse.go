@@ -49,7 +49,7 @@ func parseProgress(line string) (Progress, error) {
 			p.Frame = v
 		case "fps":
 			// Get current frames per second
-			v, err := strconv.ParseFloat(val, 64)
+			v, err := strconv.Atoi(val)
 			if err != nil {
 				return Progress{}, err
 			}

@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -28,11 +29,18 @@ type Ui struct {
 	startButton     *widget.Button
 	stopButton      *widget.Button
 	progressBar     *widget.ProgressBar
+	progressLabel   *widget.Label
 
 	// Results tab elements
 
 	// Compare tab elements
 
+	// Bindings for progress tracking
+	frameBinding   binding.Int
+	fpsBinding     binding.Int
+	elapsedBinding binding.String
+
+	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
 }
 
@@ -75,6 +83,22 @@ func (u *Ui) NewUI() {
 	// Create progress bar
 	u.progressBar = widget.NewProgressBar()
 
+	// Create bindings for progress status
+	u.frameBinding = binding.NewInt()
+	u.fpsBinding = binding.NewInt()
+	u.elapsedBinding = binding.NewString()
+	u.elapsedBinding.Set("0s")
+
+	// Create progress label
+	progressStatus := binding.NewSprintf(
+		"Frame: %4d, FPS: %3d, Elapsed: %6s",
+		u.frameBinding,
+		u.fpsBinding,
+		u.elapsedBinding,
+	)
+	u.progressLabel = widget.NewLabelWithData(progressStatus)
+	u.progressLabel.TextStyle.Monospace = true
+
 	// Top main UI elements
 	topElements := container.NewVBox(
 		u.titleLabel,
@@ -94,7 +118,10 @@ func (u *Ui) NewUI() {
 		),
 		u.startButton,
 		u.stopButton,
-		u.progressBar,
+		container.NewBorder(nil, nil, nil,
+			u.progressLabel,
+			u.progressBar,
+		),
 	)
 
 	// Results tab elements
@@ -163,5 +190,15 @@ func (u *Ui) showStopButton() {
 	fyne.Do(func() {
 		u.startButton.Hide()
 		u.stopButton.Show()
+	})
+}
+
+// Clear progress status
+func (u *Ui) clearProgressStatus() {
+	fyne.Do(func() {
+		u.progressBar.SetValue(0)
+		u.frameBinding.Set(0)
+		u.fpsBinding.Set(0)
+		u.elapsedBinding.Set("0s")
 	})
 }

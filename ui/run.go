@@ -3,7 +3,6 @@ package ui
 import (
 	"VMAF-GUI/video"
 	"context"
-	"fmt"
 	"strconv"
 
 	"fyne.io/fyne/v2"
@@ -59,7 +58,10 @@ func (u *Ui) run() {
 					u.progressBar.SetValue(float64(progress.Frame))
 				})
 
-				fmt.Println(progress)
+				// Update progress label
+				u.frameBinding.Set(progress.Frame)
+				u.fpsBinding.Set(progress.FPS)
+				u.elapsedBinding.Set(progress.Elapsed.String())
 
 			case err, ok := <-errChan: // Handle errors
 				if !ok {
@@ -68,6 +70,7 @@ func (u *Ui) run() {
 
 				u.showError(err, false)
 				u.showStartButton()
+				u.clearProgressStatus()
 
 				// Cancel vmaf calculation
 				if u.vmafCancel != nil {
@@ -84,4 +87,5 @@ func (u *Ui) run() {
 func (u *Ui) stop() {
 	u.vmafCancel()
 	u.showStartButton()
+	u.clearProgressStatus()
 }
