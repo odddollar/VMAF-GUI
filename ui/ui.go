@@ -2,6 +2,7 @@ package ui
 
 import (
 	"VMAF-GUI/video"
+	"context"
 	"errors"
 	"image/color"
 
@@ -30,6 +31,8 @@ type Ui struct {
 	// Results tab elements
 
 	// Compare tab elements
+
+	vmafCancel context.CancelFunc
 }
 
 func (u *Ui) NewUI() {
@@ -60,7 +63,7 @@ func (u *Ui) NewUI() {
 	u.distortedButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile(u.distortedEntry) })
 
 	// Create start button
-	u.startButton = widget.NewButton("Run", u.run)
+	u.startButton = widget.NewButton("Run", func() { go u.run() })
 	u.startButton.Importance = widget.HighImportance
 	u.startButton.Disable()
 
@@ -111,7 +114,7 @@ func (u *Ui) Run() {
 	u.a.Run()
 }
 
-// Runs checks to ensure program can run properly
+// Checks to ensure program can run properly
 func (u *Ui) startupChecks() {
 	if !video.CommandAvailable("ffmpeg") {
 		u.showError(errors.New("unable to find FFmpeg"), true)

@@ -3,6 +3,7 @@ package video
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"io"
 	"os/exec"
 	"time"
@@ -18,13 +19,14 @@ type Progress struct {
 }
 
 // Run vmaf calculation with progress updates
-func RunVMAF(ref, dist string) (<-chan Progress, <-chan error, error) {
+func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan error, error) {
 	// Create channel to push progress status through
 	progressChan := make(chan Progress)
 	errChan := make(chan error, 1)
 
 	// Create ffmpeg command to run vmaf calculation
-	cmd := exec.Command(
+	cmd := exec.CommandContext(
+		ctx,
 		"ffmpeg",
 		"-hide_banner",
 		"-loglevel", "error",
@@ -49,6 +51,7 @@ func RunVMAF(ref, dist string) (<-chan Progress, <-chan error, error) {
 	go func() {
 		defer close(progressChan)
 		defer close(errChan)
+		var sentErr bool // Ensures at most one error sent
 
 		// Read from command output
 		r := bufio.NewReader(stderr)
@@ -58,8 +61,14 @@ func RunVMAF(ref, dist string) (<-chan Progress, <-chan error, error) {
 			// Read byte by byte until empty
 			b, err := r.ReadByte()
 			if err != nil {
+				// Stop if context was cancelled
+				if ctx.Err() != nil {
+					break
+				}
+
 				// Send read errors that aren't no more data
 				if err != io.EOF {
+					sentErr = true
 					errChan <- err
 				}
 				break
@@ -87,6 +96,11 @@ func RunVMAF(ref, dist string) (<-chan Progress, <-chan error, error) {
 
 		// Wait for command to finish
 		if err := cmd.Wait(); err != nil {
+			// Don't report manual cancellation
+			if ctx.Err() != nil || sentErr {
+				return
+			}
+
 			errChan <- err
 			return
 		}
