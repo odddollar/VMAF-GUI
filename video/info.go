@@ -28,17 +28,31 @@ func SameVideoInfo(refPath, disPath string) (bool, error) {
 
 	// Compare resolutions
 	if refInfo.Width != disInfo.Width || refInfo.Height != disInfo.Height {
-		return false, nil
+		return false, fmt.Errorf(
+			"reference and distorted files have different resolutions: %dx%d, %dx%d",
+			refInfo.Width,
+			refInfo.Height,
+			disInfo.Width,
+			disInfo.Height,
+		)
 	}
 
 	// Compare frame rate strings
 	if refInfo.FrameRate != disInfo.FrameRate {
-		return false, nil
+		return false, fmt.Errorf(
+			"reference and distorted files have different framerates: %s, %s",
+			refInfo.FrameRate,
+			disInfo.FrameRate,
+		)
 	}
 
 	// Compare frame count
 	if refInfo.FrameCount != disInfo.FrameCount {
-		return false, nil
+		return false, fmt.Errorf(
+			"reference and distorted files have different frame counts: %s, %s",
+			refInfo.FrameCount,
+			disInfo.FrameCount,
+		)
 	}
 
 	return true, nil
@@ -75,7 +89,7 @@ func getVideoInfo(path string) (videoInfo, error) {
 
 	// Ensure only one video stream exists
 	if len(res.Streams) != 1 {
-		return videoInfo{}, fmt.Errorf("only one video stream permitted in file %s", path)
+		return videoInfo{}, fmt.Errorf("only one video stream permitted in file: %s", path)
 	}
 
 	return res.Streams[0], nil
