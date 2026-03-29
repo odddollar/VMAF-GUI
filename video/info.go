@@ -6,7 +6,7 @@ import (
 	"os/exec"
 )
 
-type videoInfo struct {
+type VideoInfo struct {
 	Width      int    `json:"width"`
 	Height     int    `json:"height"`
 	FrameRate  string `json:"r_frame_rate"`
@@ -16,12 +16,12 @@ type videoInfo struct {
 // Compare paths to ensure same metadata
 func SameVideoInfo(refPath, disPath string) (bool, error) {
 	// Get video information
-	refInfo, err := getVideoInfo(refPath)
+	refInfo, err := GetVideoInfo(refPath)
 	if err != nil {
 		return false, err
 	}
 
-	disInfo, err := getVideoInfo(disPath)
+	disInfo, err := GetVideoInfo(disPath)
 	if err != nil {
 		return false, err
 	}
@@ -59,10 +59,10 @@ func SameVideoInfo(refPath, disPath string) (bool, error) {
 }
 
 // Get information of video
-func getVideoInfo(path string) (videoInfo, error) {
+func GetVideoInfo(path string) (VideoInfo, error) {
 	// Local struct to hold ffprobe output
 	type ffprobeOut struct {
-		Streams []videoInfo `json:"streams"`
+		Streams []VideoInfo `json:"streams"`
 	}
 
 	// Get json formatted video information
@@ -78,18 +78,18 @@ func getVideoInfo(path string) (videoInfo, error) {
 	// Get command output
 	out, err := cmd.Output()
 	if err != nil {
-		return videoInfo{}, err
+		return VideoInfo{}, err
 	}
 
 	// Unmarshal to struct
 	var res ffprobeOut
 	if err := json.Unmarshal(out, &res); err != nil {
-		return videoInfo{}, err
+		return VideoInfo{}, err
 	}
 
 	// Ensure only one video stream exists
 	if len(res.Streams) != 1 {
-		return videoInfo{}, fmt.Errorf("only one video stream permitted in file: %s", path)
+		return VideoInfo{}, fmt.Errorf("only one video stream permitted in file: %s", path)
 	}
 
 	return res.Streams[0], nil

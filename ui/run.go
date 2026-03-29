@@ -4,6 +4,9 @@ import (
 	"VMAF-GUI/video"
 	"context"
 	"fmt"
+	"strconv"
+
+	"fyne.io/fyne/v2"
 )
 
 // Perform checks and run vmaf calculation
@@ -17,6 +20,19 @@ func (u *Ui) run() {
 
 	// Switch which button visible
 	u.showStopButton()
+
+	// Get reference info to update progress bar maximum
+	refInfo, err := video.GetVideoInfo(u.referenceEntry.Text)
+	if err != nil {
+		u.showError(err, false)
+		return
+	}
+	frameCount, err := strconv.ParseFloat(refInfo.FrameCount, 64)
+	if err != nil {
+		u.showError(err, false)
+		return
+	}
+	u.progressBar.Max = frameCount
 
 	// Create context to allow vmaf command cancelling
 	ctx, cancel := context.WithCancel(context.Background())
@@ -37,6 +53,11 @@ func (u *Ui) run() {
 				if !ok {
 					return
 				}
+
+				fyne.Do(func() {
+					// Update progress bar
+					u.progressBar.SetValue(float64(progress.Frame))
+				})
 
 				fmt.Println(progress)
 
