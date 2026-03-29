@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"VMAF-GUI/ffmpeg"
+	"VMAF-GUI/video"
 	"errors"
 	"image/color"
 
@@ -104,12 +104,12 @@ func (u *Ui) Run() {
 
 // Runs checks to ensure program can run properly
 func (u *Ui) startupChecks() {
-	if !ffmpeg.FFmpegAvailable() {
+	if !video.FFmpegAvailable() {
 		u.showError(errors.New("unable to find FFmpeg"), true)
 		return
 	}
 
-	if !ffmpeg.VMAFAvailable() {
+	if !video.VMAFAvailable() {
 		u.showError(errors.New("unable to find VMAF in FFmpeg"), true)
 		return
 	}
