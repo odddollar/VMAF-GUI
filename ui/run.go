@@ -15,6 +15,9 @@ func (u *Ui) run() {
 		return
 	}
 
+	// Switch which button visible
+	u.showStopButton()
+
 	// Create context to allow vmaf command cancelling
 	ctx, cancel := context.WithCancel(context.Background())
 	u.vmafCancel = cancel
@@ -43,6 +46,7 @@ func (u *Ui) run() {
 				}
 
 				u.showError(err, false)
+				u.showStartButton()
 
 				// Cancel vmaf calculation
 				if u.vmafCancel != nil {
@@ -53,4 +57,10 @@ func (u *Ui) run() {
 			}
 		}
 	}()
+}
+
+// Stop running vmaf calculation
+func (u *Ui) stop() {
+	u.vmafCancel()
+	u.showStartButton()
 }

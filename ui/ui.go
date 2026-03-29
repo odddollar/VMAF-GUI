@@ -26,6 +26,7 @@ type Ui struct {
 	referenceButton *widget.Button
 	distortedButton *widget.Button
 	startButton     *widget.Button
+	stopButton      *widget.Button
 	progressBar     *widget.ProgressBar
 
 	// Results tab elements
@@ -63,9 +64,13 @@ func (u *Ui) NewUI() {
 	u.distortedButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile(u.distortedEntry) })
 
 	// Create start button
-	u.startButton = widget.NewButton("Run", func() { go u.run() })
+	u.startButton = widget.NewButton("Start", func() { go u.run() })
 	u.startButton.Importance = widget.HighImportance
 	u.startButton.Disable()
+
+	// Create stop button
+	u.stopButton = widget.NewButton("Stop", func() { go u.stop() })
+	u.stopButton.Hide()
 
 	// Create progress bar
 	u.progressBar = widget.NewProgressBar()
@@ -88,6 +93,7 @@ func (u *Ui) NewUI() {
 			),
 		),
 		u.startButton,
+		u.stopButton,
 		u.progressBar,
 	)
 
@@ -142,4 +148,20 @@ func (u *Ui) validatePathEntries() {
 	} else {
 		fyne.Do(func() { u.startButton.Disable() })
 	}
+}
+
+// Show start button
+func (u *Ui) showStartButton() {
+	fyne.Do(func() {
+		u.startButton.Show()
+		u.stopButton.Hide()
+	})
+}
+
+// Show stop button
+func (u *Ui) showStopButton() {
+	fyne.Do(func() {
+		u.startButton.Hide()
+		u.stopButton.Show()
+	})
 }
