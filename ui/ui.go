@@ -2,8 +2,10 @@ package ui
 
 import (
 	"VMAF-GUI/video"
+	"VMAF-GUI/widgets"
 	"context"
 	"errors"
+	"image"
 	"image/color"
 
 	"fyne.io/fyne/v2"
@@ -34,6 +36,11 @@ type Ui struct {
 	// Results tab elements
 
 	// Compare tab elements
+	compareImage      *widgets.CompareWidget
+	comparePrevButton *widget.Button
+	compareNextButton *widget.Button
+	compareFrameEntry *widget.Entry
+	compareFrameLabel *widget.Label
 
 	// Bindings for progress tracking
 	frameBinding   binding.Int
@@ -127,8 +134,34 @@ func (u *Ui) NewUI() {
 	// Results tab elements
 	resultsTabElements := container.NewVBox()
 
+	// Create compare image widget
+	u.compareImage = widgets.NewCompareWidget(image.Black, image.NewUniform(color.Gray{120}))
+
+	// Create previous and next frame buttons
+	u.comparePrevButton = widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {})
+	u.compareNextButton = widget.NewButtonWithIcon("", theme.NavigateNextIcon(), func() {})
+
+	// Create entry and label for frame number tracking
+	u.compareFrameEntry = widget.NewEntry()
+	u.compareFrameLabel = widget.NewLabel("of 4096")
+	u.compareFrameLabel.TextStyle.Bold = true
+
 	// Compare tab elements
-	compareTabElements := container.NewVBox()
+	compareTabElements := container.NewBorder(
+		nil,
+		container.NewCenter(container.NewHBox(
+			u.comparePrevButton,
+			container.NewGridWrap( // Expand width of entry
+				fyne.NewSize(65, u.compareFrameEntry.MinSize().Height),
+				u.compareFrameEntry,
+			),
+			u.compareFrameLabel,
+			u.compareNextButton,
+		)),
+		nil,
+		nil,
+		u.compareImage,
+	)
 
 	// Create window layout and set content
 	u.w.SetContent(container.NewVBox(
@@ -141,7 +174,7 @@ func (u *Ui) NewUI() {
 }
 
 func (u *Ui) Run() {
-	u.w.Resize(fyne.NewSize(800, 600))
+	u.w.Resize(fyne.NewSize(800, 0))
 	u.w.Show()
 	u.startupChecks()
 	u.a.Run()
