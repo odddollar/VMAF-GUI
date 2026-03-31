@@ -4,7 +4,7 @@ import (
 	"VMAF-GUI/video"
 	"VMAF-GUI/widgets"
 	"context"
-	"errors"
+	"fmt"
 	"image"
 	"image/color"
 
@@ -183,17 +183,17 @@ func (u *Ui) Run() {
 // Checks to ensure program can run properly
 func (u *Ui) startupChecks() {
 	if !video.CommandAvailable("ffmpeg") {
-		u.showError(errors.New("unable to find FFmpeg"), true)
+		u.showError(fmt.Errorf("unable to find FFmpeg"), true)
 		return
 	}
 
 	if !video.VMAFAvailable() {
-		u.showError(errors.New("unable to find VMAF in FFmpeg"), true)
+		u.showError(fmt.Errorf("unable to find VMAF in FFmpeg"), true)
 		return
 	}
 
 	if !video.CommandAvailable("ffprobe") {
-		u.showError(errors.New("unable to find FFprobe"), true)
+		u.showError(fmt.Errorf("unable to find FFprobe"), true)
 		return
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"os/exec"
 	"time"
@@ -24,6 +25,12 @@ func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan err
 	progressChan := make(chan Progress)
 	errChan := make(chan error, 1)
 
+	// Get reference video info
+	refInfo, err := GetVideoInfo(ref)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	// Create ffmpeg command to run vmaf calculation
 	cmd := exec.CommandContext(
 		ctx,
@@ -33,7 +40,9 @@ func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan err
 		"-stats",
 		"-i", dist,
 		"-i", ref,
-		"-lavfi", "libvmaf=n_threads=8:log_path=vmaf.json:log_fmt=json",
+		"-lavfi", fmt.Sprintf("[0:v]settb=AVTB,setpts=PTS-STARTPTS,format=%s[dist];", refInfo.PixFmt)+
+			fmt.Sprintf("[1:v]settb=AVTB,setpts=PTS-STARTPTS,format=%s[ref];", refInfo.PixFmt)+
+			"[dist][ref]libvmaf=n_threads=8:log_path=vmaf.json:log_fmt=json",
 		"-f", "null", "-",
 	)
 

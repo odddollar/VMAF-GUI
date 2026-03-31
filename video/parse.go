@@ -1,7 +1,7 @@
 package video
 
 import (
-	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -15,7 +15,7 @@ func parseProgress(line string) (Progress, error) {
 	// Whitespace output for ffmpeg changes by number of characters in value
 	tokens := strings.Fields(line)
 	if len(tokens) == 0 {
-		return p, errors.New("no tokens in line")
+		return p, fmt.Errorf("no tokens in line")
 	}
 
 	// Iterate through split tokens
@@ -86,9 +86,19 @@ func parseTime(s string) (time.Duration, error) {
 	// Split string
 	parts := strings.Split(s, ":")
 	if len(parts) != 3 {
-		return 0, strconv.ErrSyntax
+		return 0, fmt.Errorf("unable to parse time: %s", s)
 	}
 
 	// Parse to Go's Duration type
 	return time.ParseDuration(parts[0] + "h" + parts[1] + "m" + parts[2] + "s")
+}
+
+// Parse fps "X/X" to float
+func parseFPS(rate string) (float64, error) {
+	var num, den float64
+	_, err := fmt.Sscanf(rate, "%f/%f", &num, &den)
+	if err != nil || den == 0 {
+		return 0, fmt.Errorf("unable to parse frame rate: %s", rate)
+	}
+	return num / den, nil
 }
