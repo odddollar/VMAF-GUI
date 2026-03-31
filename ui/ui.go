@@ -52,6 +52,9 @@ type Ui struct {
 
 	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
+
+	// Store vmaf results
+	vmafResults video.VMAFOutput
 }
 
 func (u *Ui) NewUI() {
@@ -140,7 +143,7 @@ func (u *Ui) NewUI() {
 	resultsTabElements := container.NewVBox()
 
 	// Create compare image widget
-	u.compareImage = widgets.NewCompareWidget(image.White, image.White)
+	u.compareImage = widgets.NewCompareWidget(image.Black, image.Black)
 
 	// Create previous and next frame buttons
 	u.comparePrevButton = widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {})

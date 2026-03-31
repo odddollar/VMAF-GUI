@@ -1,11 +1,68 @@
 package video
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 )
+
+// Contains progress information from ffmpeg output
+type Progress struct {
+	Frame   int
+	FPS     int
+	Time    time.Duration
+	Speed   float64
+	Elapsed time.Duration
+}
+
+// Contains vmaf information from json output
+type VMAFOutput struct {
+	Frames []struct {
+		FrameNum int `json:"frameNum"`
+		Metrics  struct {
+			VMAF float64 `json:"vmaf"`
+		} `json:"metrics"`
+	} `json:"frames"`
+	PooledMetrics struct {
+		VMAF struct {
+			Min          float64 `json:"min"`
+			Max          float64 `json:"max"`
+			Mean         float64 `json:"mean"`
+			HarmonicMean float64 `json:"harmonic_mean"`
+		} `json:"vmaf"`
+	} `json:"pooled_metrics"`
+}
+
+// Parse vmaf json output file
+func ParseJsonOutput(path string) (VMAFOutput, error) {
+	// Open file
+	f, err := os.Open(path)
+	if err != nil {
+		return VMAFOutput{}, err
+	}
+
+	// Unmarshal to struct
+	var out VMAFOutput
+	if err := json.NewDecoder(f).Decode(&out); err != nil {
+		f.Close()
+		return VMAFOutput{}, err
+	}
+
+	// Close file
+	if err := f.Close(); err != nil {
+		return VMAFOutput{}, err
+	}
+
+	// Remove path
+	if err := os.Remove(path); err != nil {
+		return VMAFOutput{}, err
+	}
+
+	return out, nil
+}
 
 // Parse progress output string from ffmpeg
 func parseProgress(line string) (Progress, error) {

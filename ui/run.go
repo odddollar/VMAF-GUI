@@ -79,6 +79,15 @@ func (u *Ui) run() {
 			case <-doneChan: // Command finished successfully
 				u.enableBottomWidgets()
 				u.showStartButton()
+
+				// Parse vmaf results and store
+				vmaf, err := video.ParseJsonOutput("vmaf.json")
+				if err != nil {
+					u.showError(err, false)
+					return
+				}
+				u.vmafResults = vmaf
+
 				return
 			}
 		}

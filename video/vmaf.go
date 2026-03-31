@@ -7,17 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
-	"time"
 )
-
-// Contains progress information from ffmpeg output
-type Progress struct {
-	Frame   int
-	FPS     int
-	Time    time.Duration
-	Speed   float64
-	Elapsed time.Duration
-}
 
 // Run vmaf calculation with progress updates
 func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan error, <-chan struct{}, error) {
