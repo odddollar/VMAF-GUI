@@ -20,15 +20,16 @@ type Progress struct {
 }
 
 // Run vmaf calculation with progress updates
-func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan error, error) {
+func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan error, <-chan struct{}, error) {
 	// Create channel to push progress status through
 	progressChan := make(chan Progress)
 	errChan := make(chan error, 1)
+	doneChan := make(chan struct{})
 
 	// Get reference video info
 	refInfo, err := GetVideoInfo(ref)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// Create ffmpeg command to run vmaf calculation
@@ -49,17 +50,16 @@ func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan err
 	// Command will output over stderr
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// Start ffmpeg
 	if err := cmd.Start(); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	go func() {
 		defer close(progressChan)
-		defer close(errChan)
 		var sentErr bool // Ensures at most one error sent
 
 		// Read from command output
@@ -113,7 +113,10 @@ func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan err
 			errChan <- err
 			return
 		}
+
+		// Report when finished sucessfully
+		close(doneChan)
 	}()
 
-	return progressChan, errChan, nil
+	return progressChan, errChan, doneChan, nil
 }

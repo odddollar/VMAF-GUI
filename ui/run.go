@@ -3,6 +3,7 @@ package ui
 import (
 	"VMAF-GUI/video"
 	"context"
+	"fmt"
 	"strconv"
 
 	"fyne.io/fyne/v2"
@@ -38,7 +39,7 @@ func (u *Ui) run() {
 	u.vmafCancel = cancel
 
 	// Start vmaf with channels
-	progressChan, errChan, err := video.RunVMAF(ctx, u.referenceEntry.Text, u.distortedEntry.Text)
+	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, u.referenceEntry.Text, u.distortedEntry.Text)
 	if err != nil {
 		u.showError(err, false)
 		return
@@ -63,11 +64,7 @@ func (u *Ui) run() {
 				u.fpsBinding.Set(progress.FPS)
 				u.elapsedBinding.Set(progress.Elapsed.String())
 
-			case err, ok := <-errChan: // Handle errors
-				if !ok {
-					return
-				}
-
+			case err := <-errChan: // Handle errors
 				u.showError(err, false)
 				u.showStartButton()
 				u.clearProgressStatus()
@@ -77,6 +74,10 @@ func (u *Ui) run() {
 					u.vmafCancel()
 					u.vmafCancel = nil
 				}
+				return
+
+			case <-doneChan: // Command finished successfully
+				fmt.Println("done")
 				return
 			}
 		}
