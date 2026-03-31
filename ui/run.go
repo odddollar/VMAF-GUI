@@ -32,6 +32,7 @@ func (u *Ui) run() {
 		return
 	}
 	u.progressBar.Max = frameCount
+	u.compareMaxFrameBinding.Set(int(frameCount))
 
 	// Create context to allow vmaf command cancelling
 	ctx, cancel := context.WithCancel(context.Background())
@@ -59,9 +60,9 @@ func (u *Ui) run() {
 				})
 
 				// Update progress label
-				u.frameBinding.Set(progress.Frame)
-				u.fpsBinding.Set(progress.FPS)
-				u.elapsedBinding.Set(progress.Elapsed.String())
+				u.progressFrameBinding.Set(progress.Frame)
+				u.progressFpsBinding.Set(progress.FPS)
+				u.progressElapsedBinding.Set(progress.Elapsed.String())
 
 			case err := <-errChan: // Handle errors
 				u.showError(err, false)

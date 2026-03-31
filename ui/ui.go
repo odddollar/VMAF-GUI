@@ -43,9 +43,12 @@ type Ui struct {
 	compareFrameLabel *widget.Label
 
 	// Bindings for progress tracking
-	frameBinding   binding.Int
-	fpsBinding     binding.Int
-	elapsedBinding binding.String
+	progressFrameBinding   binding.Int
+	progressFpsBinding     binding.Int
+	progressElapsedBinding binding.String
+
+	// Bindings for compare frame tracking
+	compareMaxFrameBinding binding.Int
 
 	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
@@ -93,17 +96,17 @@ func (u *Ui) NewUI() {
 	u.progressBar = widget.NewProgressBar()
 
 	// Create bindings for progress status
-	u.frameBinding = binding.NewInt()
-	u.fpsBinding = binding.NewInt()
-	u.elapsedBinding = binding.NewString()
-	u.elapsedBinding.Set("0s")
+	u.progressFrameBinding = binding.NewInt()
+	u.progressFpsBinding = binding.NewInt()
+	u.progressElapsedBinding = binding.NewString()
+	u.progressElapsedBinding.Set("0s")
 
 	// Create progress label
 	progressStatus := binding.NewSprintf(
 		"Frame: %4d, FPS: %3d, Elapsed: %6s",
-		u.frameBinding,
-		u.fpsBinding,
-		u.elapsedBinding,
+		u.progressFrameBinding,
+		u.progressFpsBinding,
+		u.progressElapsedBinding,
 	)
 	u.progressLabel = widget.NewLabelWithData(progressStatus)
 	u.progressLabel.TextStyle.Monospace = true
@@ -137,15 +140,22 @@ func (u *Ui) NewUI() {
 	resultsTabElements := container.NewVBox()
 
 	// Create compare image widget
-	u.compareImage = widgets.NewCompareWidget(image.Black, image.NewUniform(color.Gray{120}))
+	u.compareImage = widgets.NewCompareWidget(image.White, image.White)
 
 	// Create previous and next frame buttons
 	u.comparePrevButton = widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {})
 	u.compareNextButton = widget.NewButtonWithIcon("", theme.NavigateNextIcon(), func() {})
 
-	// Create entry and label for frame number tracking
+	// Create bindings for frame compare number tracking
+	u.compareMaxFrameBinding = binding.NewInt()
+	u.compareMaxFrameBinding.Set(0)
+
+	// Create entry and label for frame compare number tracking
 	u.compareFrameEntry = widget.NewEntry()
-	u.compareFrameLabel = widget.NewLabel("of 4096")
+	u.compareFrameLabel = widget.NewLabelWithData(binding.NewSprintf(
+		"of %d",
+		u.compareMaxFrameBinding,
+	))
 	u.compareFrameLabel.TextStyle.Bold = true
 
 	// Compare tab elements
@@ -255,8 +265,8 @@ func (u *Ui) showStopButton() {
 func (u *Ui) clearProgressStatus() {
 	fyne.Do(func() {
 		u.progressBar.SetValue(0)
-		u.frameBinding.Set(0)
-		u.fpsBinding.Set(0)
-		u.elapsedBinding.Set("0s")
+		u.progressFrameBinding.Set(0)
+		u.progressFpsBinding.Set(0)
+		u.progressElapsedBinding.Set("0s")
 	})
 }
