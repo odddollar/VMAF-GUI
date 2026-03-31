@@ -67,11 +67,13 @@ func (u *Ui) NewUI() {
 	u.referenceEntry.Validator = validateFileExists
 	u.referenceEntry.OnChanged = func(s string) {
 		u.validatePathEntries()
+		u.disableBottomWidgets()
 	}
 	u.distortedEntry = widget.NewEntry()
 	u.distortedEntry.Validator = validateFileExists
 	u.distortedEntry.OnChanged = func(s string) {
 		u.validatePathEntries()
+		u.disableBottomWidgets()
 	}
 
 	// Create file explore buttons
@@ -171,6 +173,9 @@ func (u *Ui) NewUI() {
 			container.NewTabItemWithIcon("Compare", theme.VisibilityIcon(), compareTabElements),
 		),
 	))
+
+	// Disable bottom/results/compare widgets
+	u.disableBottomWidgets()
 }
 
 func (u *Ui) Run() {
@@ -196,6 +201,26 @@ func (u *Ui) startupChecks() {
 		u.showError(fmt.Errorf("unable to find FFprobe"), true)
 		return
 	}
+}
+
+// Disable bottom/results/compare widgets
+func (u *Ui) disableBottomWidgets() {
+	fyne.Do(func() {
+		u.compareImage.Disable()
+		u.comparePrevButton.Disable()
+		u.compareNextButton.Disable()
+		u.compareFrameEntry.Disable()
+	})
+}
+
+// Enable bottom/results/compare widgets
+func (u *Ui) enableBottomWidgets() {
+	fyne.Do(func() {
+		u.compareImage.Enable()
+		u.comparePrevButton.Enable()
+		u.compareNextButton.Enable()
+		u.compareFrameEntry.Enable()
+	})
 }
 
 // Disables start button if paths are invalid

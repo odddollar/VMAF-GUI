@@ -3,7 +3,6 @@ package ui
 import (
 	"VMAF-GUI/video"
 	"context"
-	"fmt"
 	"strconv"
 
 	"fyne.io/fyne/v2"
@@ -77,7 +76,8 @@ func (u *Ui) run() {
 				return
 
 			case <-doneChan: // Command finished successfully
-				fmt.Println("done")
+				u.enableBottomWidgets()
+				u.showStartButton()
 				return
 			}
 		}

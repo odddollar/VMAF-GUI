@@ -31,6 +31,9 @@ type CompareWidget struct {
 
 	// Divider position from 0 to 1
 	splitPos float32
+
+	// Allows widget to be disabled
+	disabled bool
 }
 
 // Creates new CompareWidget with left and right images
@@ -39,6 +42,7 @@ func NewCompareWidget(imgLeft, imgRight image.Image) *CompareWidget {
 		imgLeft:  imgLeft,
 		imgRight: imgRight,
 		splitPos: 0.5,
+		disabled: false,
 	}
 	w.ExtendBaseWidget(w)
 	return w
@@ -46,6 +50,10 @@ func NewCompareWidget(imgLeft, imgRight image.Image) *CompareWidget {
 
 // Slides divider as pointer dragged
 func (w *CompareWidget) Dragged(e *fyne.DragEvent) {
+	if w.disabled {
+		return
+	}
+
 	sz := w.Size()
 	if sz.Width == 0 {
 		return
@@ -59,6 +67,10 @@ func (w *CompareWidget) DragEnd() {}
 
 // Moves divider to tapped position
 func (w *CompareWidget) Tapped(e *fyne.PointEvent) {
+	if w.disabled {
+		return
+	}
+
 	sz := w.Size()
 	if sz.Width == 0 {
 		return
@@ -78,6 +90,29 @@ func (w *CompareWidget) SetImages(imgA, imgB image.Image) {
 func (w *CompareWidget) SetSplitPosition(pos float32) {
 	w.splitPos = clamp01(pos)
 	w.Refresh()
+}
+
+// Disable widget
+func (w *CompareWidget) Disable() {
+	if w.disabled {
+		return
+	}
+	w.disabled = true
+	w.Refresh()
+}
+
+// Enable widget
+func (w *CompareWidget) Enable() {
+	if !w.disabled {
+		return
+	}
+	w.disabled = false
+	w.Refresh()
+}
+
+// Get disabled state
+func (w *CompareWidget) Disabled() bool {
+	return w.disabled
 }
 
 // Returns new renderer for CompareWidget
@@ -119,6 +154,20 @@ func (r *compareWidgetRenderer) Destroy() {}
 
 // Generates composite RGBA image for raster callback
 func (r *compareWidgetRenderer) generate(width, height int) image.Image {
+	// Helper to dim colours when disabled
+	dim := func(c color.Color) color.Color {
+		if !r.widget.disabled {
+			return c
+		}
+		r, g, b, a := c.RGBA()
+		return color.NRGBA{
+			R: uint8((r >> 8) / 2),
+			G: uint8((g >> 8) / 2),
+			B: uint8((b >> 8) / 2),
+			A: uint8(a >> 8),
+		}
+	}
+
 	// Create new image to draw to
 	out := image.NewRGBA(image.Rect(0, 0, width, height))
 	if width == 0 || height == 0 {
@@ -166,7 +215,7 @@ func (r *compareWidgetRenderer) generate(width, height int) image.Image {
 		if sy >= b.Max.Y {
 			sy = b.Max.Y - 1
 		}
-		return img.At(sx, sy)
+		return dim(img.At(sx, sy))
 	}
 
 	// Draw left and right image halves either side of splitX
@@ -179,11 +228,14 @@ func (r *compareWidgetRenderer) generate(width, height int) image.Image {
 		}
 	}
 
+	// Get colour of divider
+	dividerColour := dim(theme.Color(theme.ColorNamePrimary))
+
 	// Draw vertical divider
 	for x := splitX - 1; x <= splitX+1; x++ {
 		if x >= 0 && x < width {
 			for y := 0; y < height; y++ {
-				out.Set(x, y, theme.Color(theme.ColorNamePrimary))
+				out.Set(x, y, dividerColour)
 			}
 		}
 	}
@@ -191,7 +243,7 @@ func (r *compareWidgetRenderer) generate(width, height int) image.Image {
 	// Set pixel if within bounds
 	set := func(x, y int) {
 		if x >= 0 && x < width && y >= 0 && y < height {
-			out.Set(x, y, theme.Color(theme.ColorNamePrimary))
+			out.Set(x, y, dividerColour)
 		}
 	}
 
