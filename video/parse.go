@@ -37,7 +37,7 @@ type VMAFOutput struct {
 }
 
 // Parse vmaf json output file
-func ParseJsonOutput(path string) (VMAFOutput, error) {
+func ParseJsonOutput(path string, deleteOutput bool) (VMAFOutput, error) {
 	// Open file
 	f, err := os.Open(path)
 	if err != nil {
@@ -57,8 +57,10 @@ func ParseJsonOutput(path string) (VMAFOutput, error) {
 	}
 
 	// Remove path
-	if err := os.Remove(path); err != nil {
-		return VMAFOutput{}, err
+	if deleteOutput {
+		if err := os.Remove(path); err != nil {
+			return VMAFOutput{}, err
+		}
 	}
 
 	return out, nil

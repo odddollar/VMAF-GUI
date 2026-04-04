@@ -81,7 +81,7 @@ func (u *Ui) run() {
 				u.showStartButton()
 
 				// Parse vmaf results and store
-				vmaf, err := video.ParseJsonOutput("vmaf.json")
+				vmaf, err := video.ParseJsonOutput("vmaf.json", u.deleteOutputCheck.Checked)
 				if err != nil {
 					u.showError(err, false)
 					return

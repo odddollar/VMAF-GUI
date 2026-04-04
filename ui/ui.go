@@ -23,15 +23,16 @@ type Ui struct {
 	w fyne.Window
 
 	// Main UI elements
-	titleLabel      *canvas.Text
-	referenceEntry  *widget.Entry
-	distortedEntry  *widget.Entry
-	referenceButton *widget.Button
-	distortedButton *widget.Button
-	startButton     *widget.Button
-	stopButton      *widget.Button
-	progressBar     *widget.ProgressBar
-	progressLabel   *widget.Label
+	titleLabel        *canvas.Text
+	referenceEntry    *widget.Entry
+	distortedEntry    *widget.Entry
+	referenceButton   *widget.Button
+	distortedButton   *widget.Button
+	startButton       *widget.Button
+	stopButton        *widget.Button
+	deleteOutputCheck *widget.Check
+	progressBar       *widget.ProgressBar
+	progressLabel     *widget.Label
 
 	// Results tab elements
 
@@ -95,6 +96,10 @@ func (u *Ui) NewUI() {
 	u.stopButton = widget.NewButton("Stop", func() { go u.stop() })
 	u.stopButton.Hide()
 
+	// Create delete output check box
+	u.deleteOutputCheck = widget.NewCheck("Delete \"vmaf.json\"", func(b bool) {})
+	u.deleteOutputCheck.SetChecked(true)
+
 	// Create progress bar
 	u.progressBar = widget.NewProgressBar()
 
@@ -131,8 +136,13 @@ func (u *Ui) NewUI() {
 				),
 			),
 		),
-		u.startButton,
-		u.stopButton,
+		container.NewBorder(nil, nil, nil,
+			u.deleteOutputCheck,
+			container.NewVBox(
+				u.startButton,
+				u.stopButton,
+			),
+		),
 		container.NewBorder(nil, nil, nil,
 			u.progressLabel,
 			u.progressBar,
