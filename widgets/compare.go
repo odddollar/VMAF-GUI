@@ -79,19 +79,6 @@ func (w *CompareWidget) Tapped(e *fyne.PointEvent) {
 	w.Refresh()
 }
 
-// Updates both images
-func (w *CompareWidget) SetImages(imgA, imgB image.Image) {
-	w.imgLeft = imgA
-	w.imgRight = imgB
-	w.Refresh()
-}
-
-// Sets divider position between 0 and 1
-func (w *CompareWidget) SetSplitPosition(pos float32) {
-	w.splitPos = clamp01(pos)
-	w.Refresh()
-}
-
 // Disable widget
 func (w *CompareWidget) Disable() {
 	if w.disabled {
@@ -113,6 +100,19 @@ func (w *CompareWidget) Enable() {
 // Get disabled state
 func (w *CompareWidget) Disabled() bool {
 	return w.disabled
+}
+
+// Updates both images
+func (w *CompareWidget) SetImages(imgA, imgB image.Image) {
+	w.imgLeft = imgA
+	w.imgRight = imgB
+	w.Refresh()
+}
+
+// Sets divider position between 0 and 1
+func (w *CompareWidget) SetSplitPosition(pos float32) {
+	w.splitPos = clamp01(pos)
+	w.Refresh()
 }
 
 // Returns new renderer for CompareWidget
