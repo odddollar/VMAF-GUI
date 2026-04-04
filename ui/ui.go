@@ -35,6 +35,7 @@ type Ui struct {
 	progressLabel     *widget.Label
 
 	// Results tab elements
+	resultsGraph *widgets.VMAFGraph
 
 	// Compare tab elements
 	compareImage      *widgets.CompareWidget
@@ -149,8 +150,14 @@ func (u *Ui) NewUI() {
 		),
 	)
 
+	// Create results graph
+	u.resultsGraph = widgets.NewVMAFGraph()
+
 	// Results tab elements
-	resultsTabElements := container.NewVBox()
+	resultsTabElements := container.NewBorder(
+		nil, nil, nil, nil,
+		u.resultsGraph,
+	)
 
 	// Create compare image widget
 	u.compareImage = widgets.NewCompareWidget(image.Black, image.Black)
@@ -189,8 +196,9 @@ func (u *Ui) NewUI() {
 	)
 
 	// Create window layout and set content
-	u.w.SetContent(container.NewVBox(
+	u.w.SetContent(container.NewBorder(
 		topElements,
+		nil, nil, nil,
 		container.NewAppTabs(
 			container.NewTabItemWithIcon("Results", theme.ListIcon(), resultsTabElements),
 			container.NewTabItemWithIcon("Compare", theme.VisibilityIcon(), compareTabElements),
