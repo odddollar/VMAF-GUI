@@ -13,6 +13,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -24,6 +25,17 @@ type Ui struct {
 
 	// Global bindings
 	maxFrameBinding binding.Int
+
+	// Bindings for progress tracking
+	progressFrameBinding   binding.Int
+	progressFpsBinding     binding.Int
+	progressElapsedBinding binding.String
+
+	// Bindings for results display
+	resultsMeanBinding         binding.Float
+	resultsHarmonicMeanBinding binding.Float
+	resultsMinBinding          binding.Float
+	resultsMaxBinding          binding.Float
 
 	// Main UI elements
 	titleLabel        *canvas.Text
@@ -38,6 +50,7 @@ type Ui struct {
 	progressLabel     *widget.Label
 
 	// Results tab elements
+	resultsLabel            *widget.Label
 	resultsGraph            *widgets.VMAFGraph
 	resultsLeftVMAFLabels   *fyne.Container
 	resultsRightVMAFLabels  *fyne.Container
@@ -49,11 +62,6 @@ type Ui struct {
 	compareNextButton *widget.Button
 	compareFrameEntry *widget.Entry
 	compareFrameLabel *widget.Label
-
-	// Bindings for progress tracking
-	progressFrameBinding   binding.Int
-	progressFpsBinding     binding.Int
-	progressElapsedBinding binding.String
 
 	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
@@ -67,6 +75,18 @@ func (u *Ui) NewUI() {
 	// Create bindings for frame number tracking
 	u.maxFrameBinding = binding.NewInt()
 	u.maxFrameBinding.Set(0)
+
+	// Create bindings for progress status
+	u.progressFrameBinding = binding.NewInt()
+	u.progressFpsBinding = binding.NewInt()
+	u.progressElapsedBinding = binding.NewString()
+	u.progressElapsedBinding.Set("0s")
+
+	// Create bindings for results
+	u.resultsMeanBinding = binding.NewFloat()
+	u.resultsHarmonicMeanBinding = binding.NewFloat()
+	u.resultsMinBinding = binding.NewFloat()
+	u.resultsMaxBinding = binding.NewFloat()
 
 	// Create title widget
 	u.titleLabel = canvas.NewText("VMAF GUI", color.Black)
@@ -105,12 +125,6 @@ func (u *Ui) NewUI() {
 
 	// Create progress bar
 	u.progressBar = widget.NewProgressBar()
-
-	// Create bindings for progress status
-	u.progressFrameBinding = binding.NewInt()
-	u.progressFpsBinding = binding.NewInt()
-	u.progressElapsedBinding = binding.NewString()
-	u.progressElapsedBinding.Set("0s")
 
 	// Create progress label
 	progressStatus := binding.NewSprintf(
@@ -152,6 +166,17 @@ func (u *Ui) NewUI() {
 		),
 	)
 
+	// Create results label
+	resultsText := binding.NewSprintf(
+		"VMAF mean: %.2f, VMAF harmonic mean: %.2f, VMAF minimum: %.2f, VMAF maximum: %.2f",
+		u.resultsMeanBinding,
+		u.resultsHarmonicMeanBinding,
+		u.resultsMinBinding,
+		u.resultsMaxBinding,
+	)
+	u.resultsLabel = widget.NewLabelWithData(resultsText)
+	u.resultsLabel.TextStyle.Monospace = true
+
 	// Create results graph
 	u.resultsGraph = widgets.NewVMAFGraph()
 
@@ -162,7 +187,11 @@ func (u *Ui) NewUI() {
 
 	// Results tab elements
 	resultsTabElements := container.NewBorder(
-		nil,
+		container.NewHBox(
+			layout.NewSpacer(),
+			u.resultsLabel,
+			layout.NewSpacer(),
+		),
 		u.resultsFrameCountLabels,
 		u.resultsLeftVMAFLabels,
 		u.resultsRightVMAFLabels,

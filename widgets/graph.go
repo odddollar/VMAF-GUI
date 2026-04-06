@@ -147,7 +147,7 @@ type vmafGraphRenderer struct {
 
 // Returns minimum size of VMAFGraph
 func (r *vmafGraphRenderer) MinSize() fyne.Size {
-	return fyne.NewSize(200, 200)
+	return fyne.NewSize(250, 250)
 }
 
 // Lays out raster to fill VMAFGraph

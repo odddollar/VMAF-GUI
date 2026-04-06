@@ -99,6 +99,12 @@ func (u *Ui) run() {
 				}
 
 				fyne.Do(func() {
+					// Update results
+					u.resultsMeanBinding.Set(vmaf.PooledMetrics.VMAF.Mean)
+					u.resultsHarmonicMeanBinding.Set(vmaf.PooledMetrics.VMAF.HarmonicMean)
+					u.resultsMinBinding.Set(vmaf.PooledMetrics.VMAF.Min)
+					u.resultsMaxBinding.Set(vmaf.PooledMetrics.VMAF.Max)
+
 					// Update graph
 					u.resultsGraph.SetVMAF(vmaf)
 				})
