@@ -39,18 +39,18 @@ func SameVideoInfo(refPath, disPath string) (bool, error) {
 	}
 
 	// Compare frame rate strings
-	if refInfo.FrameRate != disInfo.FrameRate {
+	refFPS, _ := parseFPS(refInfo.FrameRate)
+	disFPS, _ := parseFPS(disInfo.FrameRate)
+	if refFPS != disFPS {
 		return false, fmt.Errorf(
 			"reference and distorted files have different framerates: %s, %s",
-			refInfo.FrameRate,
-			disInfo.FrameRate,
+			refInfo.FrameCount,
+			disInfo.FrameCount,
 		)
 	}
 
 	// Compare frame count
-	refFPS, _ := parseFPS(refInfo.FrameRate)
-	disFPS, _ := parseFPS(disInfo.FrameRate)
-	if refFPS != disFPS {
+	if refInfo.FrameCount != disInfo.FrameCount {
 		return false, fmt.Errorf(
 			"reference and distorted files have different frame counts: %s, %s",
 			refInfo.FrameCount,
