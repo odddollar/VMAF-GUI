@@ -48,6 +48,7 @@ func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan err
 		return nil, nil, nil, err
 	}
 
+	// Parse progress
 	go func() {
 		defer close(progressChan)
 		var sentErr bool // Ensures at most one error sent

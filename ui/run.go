@@ -17,8 +17,9 @@ func (u *Ui) run() {
 		return
 	}
 
-	// Switch which button visible
+	// Switch which button visible and clear progress
 	u.showStopButton()
+	u.clearProgressStatus()
 
 	// Get reference info to update progress bar maximum
 	refInfo, err := video.GetVideoInfo(u.referenceEntry.Text)
@@ -87,8 +88,10 @@ func (u *Ui) run() {
 					return
 				}
 
-				// Update graph
-				u.resultsGraph.SetVMAF(vmaf)
+				fyne.Do(func() {
+					// Update graph
+					u.resultsGraph.SetVMAF(vmaf)
+				})
 
 				return
 			}

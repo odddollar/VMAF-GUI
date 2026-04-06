@@ -27,6 +27,47 @@ func newEmptyImage(width, height int, c color.Color) *image.NRGBA {
 	return img
 }
 
+// Get absolute value
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+// Draw line between two sets of coordinates
+func drawLine(img *image.NRGBA, x0, y0, x1, y1 int, c color.Color) {
+	dx := abs(x1 - x0)
+	dy := -abs(y1 - y0)
+	sx := -1
+	if x0 < x1 {
+		sx = 1
+	}
+	sy := -1
+	if y0 < y1 {
+		sy = 1
+	}
+	err := dx + dy
+
+	for {
+		if image.Pt(x0, y0).In(img.Bounds()) {
+			img.Set(x0, y0, c)
+		}
+		if x0 == x1 && y0 == y1 {
+			break
+		}
+		e2 := 2 * err
+		if e2 >= dy {
+			err += dy
+			x0 += sx
+		}
+		if e2 <= dx {
+			err += dx
+			y0 += sy
+		}
+	}
+}
+
 // Custom widget that displays vmaf results across video frames
 type VMAFGraph struct {
 	widget.BaseWidget
@@ -119,16 +160,58 @@ func (r *vmafGraphRenderer) generate(width, height int) image.Image {
 		return out
 	}
 
-	// Only draw tooltip if mouse in
-	if r.widget.mouseIn {
+	// Get frame data
+	frames := r.widget.vmafData.Frames
+	n := len(frames)
+	if n == 0 {
+		return out
+	}
+
+	// Padding for graph margins
+	pad := float32(20)
+
+	// Graph area
+	gw := float32(width) - pad*2
+	gh := float32(height) - pad*2
+
+	// Convert frame index to x coordinate
+	scaleX := func(i int) int {
+		return int(pad + (float32(i)/float32(n-1))*gw)
+	}
+
+	// Convert vmaf score to y coordinate
+	scaleY := func(v float64) int {
+		return int(pad + (1.0-float32(v)/100.0)*gh)
+	}
+
+	// Draw lines for every vmaf frame value
+	for i := 0; i < n-1; i++ {
+		x1 := scaleX(i)
+		y1 := scaleY(frames[i].Metrics.VMAF)
+
+		x2 := scaleX(i + 1)
+		y2 := scaleY(frames[i+1].Metrics.VMAF)
+
+		drawLine(out, x1, y1, x2, y2, theme.Color(theme.ColorNamePrimary))
+	}
+
+	// Only draw tooltip if mouse in and frames exist
+	if r.widget.mouseIn && n > 0 {
 		// Initialise font for tooltip drawing
 		r.initialiseFont()
 
-		// Create text
-		label := fmt.Sprintf("%.0f, %.0f",
-			r.widget.mousePos.X,
-			r.widget.mousePos.Y,
+		// Scale mouse position to frame number
+		i := min(
+			max(
+				int(((r.widget.mousePos.X-pad)/gw)*float32(n-1)+0.5),
+				0,
+			),
+			n-1,
 		)
+
+		// Create text
+		frame := frames[i]
+		label := fmt.Sprintf("Frame: %d\nVMAF: %.2f", frame.FrameNum, frame.Metrics.VMAF)
 
 		// Get proper tooltip sizing
 		padding := float32(6)
