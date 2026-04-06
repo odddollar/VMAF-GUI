@@ -24,11 +24,13 @@ func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan err
 
 	// Create ffmpeg filter
 	filter := fmt.Sprintf(
-		"[0:v]settb=AVTB,setpts=PTS-STARTPTS,scale=%d:%d:flags=bicubic,format=%s[dist];"+
-			"[1:v]settb=AVTB,setpts=PTS-STARTPTS,format=%s[ref];"+
+		"[0:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,scale=%d:%d:flags=bicubic,format=%s[dist];"+
+			"[1:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,format=%s[ref];"+
 			"[dist][ref]libvmaf=n_threads=8:log_path=vmaf.json:log_fmt=json",
+		refInfo.FrameRate,
 		refInfo.Width, refInfo.Height,
 		refInfo.PixFmt,
+		refInfo.FrameRate,
 		refInfo.PixFmt,
 	)
 

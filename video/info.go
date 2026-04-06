@@ -16,8 +16,9 @@ type VideoInfo struct {
 }
 
 // Compare paths to ensure same metadata
-// Must be same frame rate and frame count
-// FFmpeg command will normalise resolution and pixel format to reference's
+// Must be same frame rate and frame count as frames must align for comparisons
+// Frame rate will be normalised to reference's to enforce CFR
+// Resolution and pixel format also normalised to reference's
 func SameVideoInfo(refPath, disPath string) (bool, error) {
 	// Get video information
 	refInfo, err := GetVideoInfo(refPath)
