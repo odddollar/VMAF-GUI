@@ -18,18 +18,20 @@ func (u *Ui) run() {
 	}
 
 	// Switch which button visible and clear progress
+	u.disableRunningWidgets()
+	u.disableBottomWidgets()
 	u.showStopButton()
 	u.clearProgressStatus()
 
 	// Get reference info to update progress bar maximum
 	refInfo, err := video.GetVideoInfo(u.referenceEntry.Text)
 	if err != nil {
-		u.showError(err, false)
+		u.showErrorAndReset(err, false)
 		return
 	}
 	frameCount, err := strconv.ParseFloat(refInfo.FrameCount, 64)
 	if err != nil {
-		u.showError(err, false)
+		u.showErrorAndReset(err, false)
 		return
 	}
 	u.progressBar.Max = frameCount
@@ -51,7 +53,7 @@ func (u *Ui) run() {
 	// Start vmaf with channels
 	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, u.referenceEntry.Text, u.distortedEntry.Text)
 	if err != nil {
-		u.showError(err, false)
+		u.showErrorAndReset(err, false)
 		return
 	}
 
@@ -75,9 +77,7 @@ func (u *Ui) run() {
 				u.progressElapsedBinding.Set(progress.Elapsed.String())
 
 			case err := <-errChan: // Handle errors
-				u.showError(err, false)
-				u.showStartButton()
-				u.clearProgressStatus()
+				u.showErrorAndReset(err, false)
 
 				// Cancel vmaf calculation
 				if u.vmafCancel != nil {
@@ -87,6 +87,7 @@ func (u *Ui) run() {
 				return
 
 			case <-doneChan: // Command finished successfully
+				u.enableRunningWidgets()
 				u.enableBottomWidgets()
 				u.showStartButton()
 
@@ -114,6 +115,7 @@ func (u *Ui) stop() {
 		u.vmafCancel()
 		u.vmafCancel = nil
 	}
+	u.enableRunningWidgets()
 	u.showStartButton()
 	u.clearProgressStatus()
 }

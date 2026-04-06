@@ -22,3 +22,11 @@ func (u *Ui) showError(err error, fatal bool) {
 		d.Show()
 	})
 }
+
+// Show error and reset ui
+func (u *Ui) showErrorAndReset(err error, fatal bool) {
+	u.enableRunningWidgets()
+	u.showStartButton()
+	u.clearProgressStatus()
+	u.showError(err, fatal)
+}

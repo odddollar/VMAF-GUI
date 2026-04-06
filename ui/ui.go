@@ -79,13 +79,11 @@ func (u *Ui) NewUI() {
 	u.referenceEntry.Validator = validateFileExists
 	u.referenceEntry.OnChanged = func(s string) {
 		u.validatePathEntries()
-		u.disableBottomWidgets()
 	}
 	u.distortedEntry = widget.NewEntry()
 	u.distortedEntry.Validator = validateFileExists
 	u.distortedEntry.OnChanged = func(s string) {
 		u.validatePathEntries()
-		u.disableBottomWidgets()
 	}
 
 	// Create file explore buttons
@@ -213,7 +211,6 @@ func (u *Ui) NewUI() {
 		),
 	))
 
-	// Disable bottom/results/compare widgets
 	u.disableBottomWidgets()
 }
 
@@ -242,7 +239,29 @@ func (u *Ui) startupChecks() {
 	}
 }
 
-// Disable bottom/results/compare widgets
+// Disable widgets that shouldn't be changed when running
+func (u *Ui) disableRunningWidgets() {
+	fyne.Do(func() {
+		u.referenceEntry.Disable()
+		u.distortedEntry.Disable()
+		u.referenceButton.Disable()
+		u.distortedButton.Disable()
+		u.deleteOutputCheck.Disable()
+	})
+}
+
+// Enable widgets that shouldn't be changed when running
+func (u *Ui) enableRunningWidgets() {
+	fyne.Do(func() {
+		u.referenceEntry.Enable()
+		u.distortedEntry.Enable()
+		u.referenceButton.Enable()
+		u.distortedButton.Enable()
+		u.deleteOutputCheck.Enable()
+	})
+}
+
+// Disable bottom widgets that shouldn't be enabled until successfully completed
 func (u *Ui) disableBottomWidgets() {
 	fyne.Do(func() {
 		u.comparePrevButton.Disable()
@@ -251,7 +270,7 @@ func (u *Ui) disableBottomWidgets() {
 	})
 }
 
-// Enable bottom/results/compare widgets
+// Enable bottom widgets that shouldn't be enabled until successfully completed
 func (u *Ui) enableBottomWidgets() {
 	fyne.Do(func() {
 		u.comparePrevButton.Enable()
