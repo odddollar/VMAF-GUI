@@ -245,7 +245,6 @@ func (u *Ui) startupChecks() {
 // Disable bottom/results/compare widgets
 func (u *Ui) disableBottomWidgets() {
 	fyne.Do(func() {
-		u.compareImage.Disable()
 		u.comparePrevButton.Disable()
 		u.compareNextButton.Disable()
 		u.compareFrameEntry.Disable()
@@ -255,7 +254,6 @@ func (u *Ui) disableBottomWidgets() {
 // Enable bottom/results/compare widgets
 func (u *Ui) enableBottomWidgets() {
 	fyne.Do(func() {
-		u.compareImage.Enable()
 		u.comparePrevButton.Enable()
 		u.compareNextButton.Enable()
 		u.compareFrameEntry.Enable()

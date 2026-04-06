@@ -256,8 +256,8 @@ func (r *vmafGraphRenderer) generate(width, height int) image.Image {
 			lineHeight = h
 		}
 		textHeight = lineHeight * float32(len(lines))
-		bgWidth := textWidth + padding*2
-		bgHeight := textHeight + padding*float32(len(lines)+1)
+		bgWidth := textWidth + padding*2 - 1
+		bgHeight := textHeight + padding*float32(len(lines)+1) - 2
 
 		// Put tooltip in bottom right corner of cursor
 		tx := r.widget.mousePos.X + offset
