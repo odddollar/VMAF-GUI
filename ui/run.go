@@ -33,7 +33,7 @@ func (u *Ui) run() {
 		return
 	}
 	u.progressBar.Max = frameCount
-	u.compareMaxFrameBinding.Set(int(frameCount))
+	u.maxFrameBinding.Set(int(frameCount))
 
 	// Create context to allow vmaf command cancelling
 	ctx, cancel := context.WithCancel(context.Background())

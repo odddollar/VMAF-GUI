@@ -22,6 +22,9 @@ type Ui struct {
 	a fyne.App
 	w fyne.Window
 
+	// Bindings
+	maxFrameBinding binding.Int
+
 	// Main UI elements
 	titleLabel        *canvas.Text
 	referenceEntry    *widget.Entry
@@ -35,7 +38,10 @@ type Ui struct {
 	progressLabel     *widget.Label
 
 	// Results tab elements
-	resultsGraph *widgets.VMAFGraph
+	resultsGraph            *widgets.VMAFGraph
+	resultsLeftVMAFLabels   *fyne.Container
+	resultsRightVMAFLabels  *fyne.Container
+	resultsFrameCountLabels *fyne.Container
 
 	// Compare tab elements
 	compareImage      *widgets.CompareWidget
@@ -49,9 +55,6 @@ type Ui struct {
 	progressFpsBinding     binding.Int
 	progressElapsedBinding binding.String
 
-	// Bindings for compare frame tracking
-	compareMaxFrameBinding binding.Int
-
 	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
 }
@@ -60,6 +63,10 @@ func (u *Ui) NewUI() {
 	// Create window
 	u.a = app.New()
 	u.w = u.a.NewWindow("VMAF GUI")
+
+	// Create bindings for frame number tracking
+	u.maxFrameBinding = binding.NewInt()
+	u.maxFrameBinding.Set(0)
 
 	// Create title widget
 	u.titleLabel = canvas.NewText("VMAF GUI", color.Black)
@@ -150,9 +157,17 @@ func (u *Ui) NewUI() {
 	// Create results graph
 	u.resultsGraph = widgets.NewVMAFGraph()
 
+	// Create results graph labels
+	u.resultsLeftVMAFLabels = newVmafScale(fyne.TextAlignTrailing)
+	u.resultsRightVMAFLabels = newVmafScale(fyne.TextAlignLeading)
+	u.resultsFrameCountLabels = newFrameScale(u.maxFrameBinding)
+
 	// Results tab elements
 	resultsTabElements := container.NewBorder(
-		nil, nil, nil, nil,
+		nil,
+		u.resultsFrameCountLabels,
+		u.resultsLeftVMAFLabels,
+		u.resultsRightVMAFLabels,
 		u.resultsGraph,
 	)
 
@@ -163,15 +178,11 @@ func (u *Ui) NewUI() {
 	u.comparePrevButton = widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {})
 	u.compareNextButton = widget.NewButtonWithIcon("", theme.NavigateNextIcon(), func() {})
 
-	// Create bindings for frame compare number tracking
-	u.compareMaxFrameBinding = binding.NewInt()
-	u.compareMaxFrameBinding.Set(0)
-
 	// Create entry and label for frame compare number tracking
 	u.compareFrameEntry = widget.NewEntry()
 	u.compareFrameLabel = widget.NewLabelWithData(binding.NewSprintf(
 		"of %d",
-		u.compareMaxFrameBinding,
+		u.maxFrameBinding,
 	))
 	u.compareFrameLabel.TextStyle.Bold = true
 
