@@ -16,7 +16,8 @@ type VideoInfo struct {
 }
 
 // Compare paths to ensure same metadata
-// Must be same resolution, frame rate, frame count
+// Must be same frame rate and frame count
+// FFmpeg command will normalise resolution and pixel format to reference's
 func SameVideoInfo(refPath, disPath string) (bool, error) {
 	// Get video information
 	refInfo, err := GetVideoInfo(refPath)
@@ -29,23 +30,14 @@ func SameVideoInfo(refPath, disPath string) (bool, error) {
 		return false, err
 	}
 
-	// Compare resolutions
-	if refInfo.Width != disInfo.Width || refInfo.Height != disInfo.Height {
-		return false, fmt.Errorf(
-			"reference and distorted files have different resolutions: %dx%d, %dx%d",
-			refInfo.Width, refInfo.Height,
-			disInfo.Width, disInfo.Height,
-		)
-	}
-
 	// Compare frame rate strings
 	refFPS, _ := parseFPS(refInfo.FrameRate)
 	disFPS, _ := parseFPS(disInfo.FrameRate)
 	if refFPS != disFPS {
 		return false, fmt.Errorf(
 			"reference and distorted files have different framerates: %s, %s",
-			refInfo.FrameCount,
-			disInfo.FrameCount,
+			refInfo.FrameRate,
+			disInfo.FrameRate,
 		)
 	}
 

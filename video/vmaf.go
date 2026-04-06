@@ -22,6 +22,16 @@ func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan err
 		return nil, nil, nil, err
 	}
 
+	// Create ffmpeg filter
+	filter := fmt.Sprintf(
+		"[0:v]settb=AVTB,setpts=PTS-STARTPTS,scale=%d:%d:flags=bicubic,format=%s[dist];"+
+			"[1:v]settb=AVTB,setpts=PTS-STARTPTS,format=%s[ref];"+
+			"[dist][ref]libvmaf=n_threads=8:log_path=vmaf.json:log_fmt=json",
+		refInfo.Width, refInfo.Height,
+		refInfo.PixFmt,
+		refInfo.PixFmt,
+	)
+
 	// Create ffmpeg command to run vmaf calculation
 	cmd := exec.CommandContext(
 		ctx,
@@ -31,9 +41,7 @@ func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan err
 		"-stats",
 		"-i", dist,
 		"-i", ref,
-		"-lavfi", fmt.Sprintf("[0:v]settb=AVTB,setpts=PTS-STARTPTS,format=%s[dist];", refInfo.PixFmt)+
-			fmt.Sprintf("[1:v]settb=AVTB,setpts=PTS-STARTPTS,format=%s[ref];", refInfo.PixFmt)+
-			"[dist][ref]libvmaf=n_threads=8:log_path=vmaf.json:log_fmt=json",
+		"-lavfi", filter,
 		"-f", "null", "-",
 	)
 
