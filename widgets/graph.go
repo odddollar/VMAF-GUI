@@ -37,30 +37,46 @@ func abs(x int) int {
 
 // Draw line between two sets of coordinates
 func drawLine(img *image.NRGBA, x0, y0, x1, y1 int, c color.Color) {
+	// Calculate distance between points
 	dx := abs(x1 - x0)
 	dy := -abs(y1 - y0)
+
+	// Step direction for x
 	sx := -1
 	if x0 < x1 {
 		sx = 1
 	}
+
+	// Step direction for y
 	sy := -1
 	if y0 < y1 {
 		sy = 1
 	}
+
+	// Total error/distance from destination
 	err := dx + dy
 
 	for {
+		// Draw current pixel if inside bounds
 		if image.Pt(x0, y0).In(img.Bounds()) {
 			img.Set(x0, y0, c)
 		}
+
+		// Endpoint reached
 		if x0 == x1 && y0 == y1 {
 			break
 		}
+
+		// Double error for comparison
 		e2 := 2 * err
+
+		// Move in x direction if error threshold crossed
 		if e2 >= dy {
 			err += dy
 			x0 += sx
 		}
+
+		// Move in y direction if error threshold crossed
 		if e2 <= dx {
 			err += dx
 			y0 += sy
@@ -167,32 +183,36 @@ func (r *vmafGraphRenderer) generate(width, height int) image.Image {
 		return out
 	}
 
-	// Padding for graph margins
-	pad := float32(20)
-
 	// Graph area
-	gw := float32(width) - pad*2
-	gh := float32(height) - pad*2
+	gw := float32(width)
+	gh := float32(height)
 
 	// Convert frame index to x coordinate
 	scaleX := func(i int) int {
-		return int(pad + (float32(i)/float32(n-1))*gw)
+		return int((float32(i) / float32(n-1)) * gw)
 	}
 
 	// Convert vmaf score to y coordinate
 	scaleY := func(v float64) int {
-		return int(pad + (1.0-float32(v)/100.0)*gh)
+		return int((1.0 - float32(v)/100.0) * gh)
 	}
 
-	// Draw lines for every vmaf frame value
-	for i := 0; i < n-1; i++ {
-		x1 := scaleX(i)
-		y1 := scaleY(frames[i].Metrics.VMAF)
+	// Draw single line if only one frame
+	if n == 1 {
+		y := int((1.0 - float32(frames[0].Metrics.VMAF)/100.0) * gh)
 
-		x2 := scaleX(i + 1)
-		y2 := scaleY(frames[i+1].Metrics.VMAF)
+		drawLine(out, 0, y, width-1, y, theme.Color(theme.ColorNamePrimary))
+	} else {
+		// Draw lines for every vmaf frame value
+		for i := 0; i < n-1; i++ {
+			x1 := scaleX(i)
+			y1 := scaleY(frames[i].Metrics.VMAF)
 
-		drawLine(out, x1, y1, x2, y2, theme.Color(theme.ColorNamePrimary))
+			x2 := scaleX(i + 1)
+			y2 := scaleY(frames[i+1].Metrics.VMAF)
+
+			drawLine(out, x1, y1, x2, y2, theme.Color(theme.ColorNamePrimary))
+		}
 	}
 
 	// Only draw tooltip if mouse in and frames exist
@@ -203,7 +223,7 @@ func (r *vmafGraphRenderer) generate(width, height int) image.Image {
 		// Scale mouse position to frame number
 		i := min(
 			max(
-				int(((r.widget.mousePos.X-pad)/gw)*float32(n-1)+0.5),
+				int((r.widget.mousePos.X/gw)*float32(n-1)+0.5),
 				0,
 			),
 			n-1,
@@ -211,7 +231,7 @@ func (r *vmafGraphRenderer) generate(width, height int) image.Image {
 
 		// Create text
 		frame := frames[i]
-		label := fmt.Sprintf("Frame: %d\nVMAF: %.2f", frame.FrameNum, frame.Metrics.VMAF)
+		label := fmt.Sprintf("Frame: %d\nVMAF: %.2f", frame.FrameNum+1, frame.Metrics.VMAF)
 
 		// Get proper tooltip sizing
 		padding := float32(6)
