@@ -22,7 +22,7 @@ type Ui struct {
 	a fyne.App
 	w fyne.Window
 
-	// Bindings
+	// Global bindings
 	maxFrameBinding binding.Int
 
 	// Main UI elements

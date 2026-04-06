@@ -231,18 +231,33 @@ func (r *vmafGraphRenderer) generate(width, height int) image.Image {
 
 		// Create text
 		frame := frames[i]
-		label := fmt.Sprintf("Frame: %d\nVMAF: %.2f", frame.FrameNum+1, frame.Metrics.VMAF)
+		lines := []string{
+			fmt.Sprintf("Frame: %d", frame.FrameNum+1),
+			fmt.Sprintf("VMAF: %.2f", frame.Metrics.VMAF),
+		}
 
 		// Get proper tooltip sizing
 		padding := float32(6)
 		offset := float32(12)
 
 		// Measure text using font metrics
-		bounds, _ := font.BoundString(r.fontFace, label)
-		textWidth := float32((bounds.Max.X - bounds.Min.X).Ceil())
-		textHeight := float32((bounds.Max.Y - bounds.Min.Y).Ceil())
+		var textWidth float32
+		var textHeight float32
+		var lineHeight float32
+		for _, line := range lines {
+			bounds, _ := font.BoundString(r.fontFace, line)
+
+			w := float32((bounds.Max.X - bounds.Min.X).Ceil())
+			h := float32((bounds.Max.Y - bounds.Min.Y).Ceil())
+
+			if w > textWidth {
+				textWidth = w
+			}
+			lineHeight = h
+		}
+		textHeight = lineHeight * float32(len(lines))
 		bgWidth := textWidth + padding*2
-		bgHeight := textHeight + padding*2
+		bgHeight := textHeight + padding*float32(len(lines)+1)
 
 		// Put tooltip in bottom right corner of cursor
 		tx := r.widget.mousePos.X + offset
@@ -274,12 +289,16 @@ func (r *vmafGraphRenderer) generate(width, height int) image.Image {
 			Dst:  out,
 			Src:  image.NewUniform(color.White),
 			Face: r.fontFace,
-			Dot: fixed.Point26_6{
-				X: fixed.I(int(tx + padding - 1)),
-				Y: fixed.I(int(ty + padding + textHeight - 1)),
-			},
 		}
-		d.DrawString(label)
+		textY := ty + padding + lineHeight
+		for _, line := range lines {
+			d.Dot = fixed.Point26_6{
+				X: fixed.I(int(tx + padding - 1)),
+				Y: fixed.I(int(textY - 1)),
+			}
+			d.DrawString(line)
+			textY += lineHeight + padding
+		}
 	}
 
 	return out
