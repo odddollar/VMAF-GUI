@@ -39,6 +39,15 @@ func (u *Ui) run() {
 	ctx, cancel := context.WithCancel(context.Background())
 	u.vmafCancel = cancel
 
+	// Intercept to stop calculation when app closed
+	u.w.SetCloseIntercept(func() {
+		if u.vmafCancel != nil {
+			u.vmafCancel()
+			u.vmafCancel = nil
+		}
+		u.w.Close()
+	})
+
 	// Start vmaf with channels
 	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, u.referenceEntry.Text, u.distortedEntry.Text)
 	if err != nil {
@@ -101,7 +110,10 @@ func (u *Ui) run() {
 
 // Stop running vmaf calculation
 func (u *Ui) stop() {
-	u.vmafCancel()
+	if u.vmafCancel != nil {
+		u.vmafCancel()
+		u.vmafCancel = nil
+	}
 	u.showStartButton()
 	u.clearProgressStatus()
 }
