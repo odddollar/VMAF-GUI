@@ -54,9 +54,6 @@ type Ui struct {
 
 	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
-
-	// Store vmaf results
-	vmafResults video.VMAFOutput
 }
 
 func (u *Ui) NewUI() {

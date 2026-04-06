@@ -67,6 +67,12 @@ func (w *VMAFGraph) MouseOut() {
 	w.Refresh()
 }
 
+// Set vmaf results
+func (w *VMAFGraph) SetVMAF(vmaf video.VMAFOutput) {
+	w.vmafData = vmaf
+	w.Refresh()
+}
+
 // Returns new renderer for VMAFGraph
 func (w *VMAFGraph) CreateRenderer() fyne.WidgetRenderer {
 	r := &vmafGraphRenderer{}

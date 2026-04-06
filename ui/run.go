@@ -86,7 +86,9 @@ func (u *Ui) run() {
 					u.showError(err, false)
 					return
 				}
-				u.vmafResults = vmaf
+
+				// Update graph
+				u.resultsGraph.SetVMAF(vmaf)
 
 				return
 			}
