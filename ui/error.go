@@ -27,6 +27,6 @@ func (u *Ui) showError(err error, fatal bool) {
 func (u *Ui) showErrorAndReset(err error, fatal bool) {
 	u.enableRunningWidgets()
 	u.showStartButton()
-	u.clearProgressStatus()
+	u.resetState()
 	u.showError(err, fatal)
 }

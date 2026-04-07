@@ -208,9 +208,12 @@ func (u *Ui) NewUI() {
 	u.comparePrevButton = widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {})
 	u.compareNextButton = widget.NewButtonWithIcon("", theme.NavigateNextIcon(), func() {})
 
-	// Create entry and label for frame compare number tracking
+	// Create entry that only allows digits
 	u.compareFrameEntry = widget.NewEntry()
 	u.compareFrameEntry.SetText("1")
+	u.compareFrameEntry.OnChanged = u.restrictCompareFrameEntry
+
+	// Create dynamic label for max frame number
 	u.compareFrameLabel = widget.NewLabelWithData(binding.NewSprintf(
 		"of %d",
 		u.maxFrameBinding,
@@ -328,12 +331,13 @@ func (u *Ui) showStopButton() {
 	})
 }
 
-// Clear progress status
-func (u *Ui) clearProgressStatus() {
+// Reset state of widgets to new
+func (u *Ui) resetState() {
 	fyne.Do(func() {
 		u.progressBar.SetValue(0)
 		u.progressFrameBinding.Set(0)
 		u.progressFpsBinding.Set(0)
 		u.progressElapsedBinding.Set("0s")
+		u.compareFrameEntry.SetText("1")
 	})
 }

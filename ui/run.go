@@ -21,7 +21,7 @@ func (u *Ui) run() {
 	u.disableRunningWidgets()
 	u.disableBottomWidgets()
 	u.showStopButton()
-	u.clearProgressStatus()
+	u.resetState()
 
 	// Get reference info to update progress bar maximum
 	u.refInfo, err = video.GetVideoInfo(u.referenceEntry.Text)
@@ -126,5 +126,5 @@ func (u *Ui) stop() {
 	}
 	u.enableRunningWidgets()
 	u.showStartButton()
-	u.clearProgressStatus()
+	u.resetState()
 }
