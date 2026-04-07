@@ -24,12 +24,12 @@ func (u *Ui) run() {
 	u.clearProgressStatus()
 
 	// Get reference info to update progress bar maximum
-	refInfo, err := video.GetVideoInfo(u.referenceEntry.Text)
+	u.refInfo, err = video.GetVideoInfo(u.referenceEntry.Text)
 	if err != nil {
 		u.showErrorAndReset(err, false)
 		return
 	}
-	frameCount, err := strconv.ParseFloat(refInfo.FrameCount, 64)
+	frameCount, err := strconv.ParseFloat(u.refInfo.FrameCount, 64)
 	if err != nil {
 		u.showErrorAndReset(err, false)
 		return
@@ -98,12 +98,8 @@ func (u *Ui) run() {
 					return
 				}
 
-				// Get frames
-				refImg, disImg, err := video.GetFramePair(context.TODO(), u.referenceEntry.Text, u.distortedEntry.Text, refInfo, 0)
-				if err != nil {
-					u.showError(err, false)
-					return
-				}
+				// Update compare widget to first frame
+				go u.updateCompareImageIndex(0)
 
 				fyne.Do(func() {
 					// Update results
@@ -114,9 +110,6 @@ func (u *Ui) run() {
 
 					// Update graph
 					u.resultsGraph.SetVMAF(vmaf)
-
-					// Update compare image
-					u.compareImage.SetImages(refImg, disImg)
 				})
 
 				return

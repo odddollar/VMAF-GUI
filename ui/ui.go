@@ -57,7 +57,7 @@ type Ui struct {
 	resultsFrameCountLabels *fyne.Container
 
 	// Compare tab elements
-	compareImage      *widgets.CompareWidget
+	compareImages     *widgets.CompareWidget
 	comparePrevButton *widget.Button
 	compareNextButton *widget.Button
 	compareFrameEntry *widget.Entry
@@ -65,6 +65,9 @@ type Ui struct {
 
 	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
+
+	// Store information for current reference file
+	refInfo video.VideoInfo
 }
 
 func (u *Ui) NewUI() {
@@ -199,7 +202,7 @@ func (u *Ui) NewUI() {
 	)
 
 	// Create compare image widget
-	u.compareImage = widgets.NewCompareWidget(image.Black, image.Black)
+	u.compareImages = widgets.NewCompareWidget(image.Black, image.Black)
 
 	// Create previous and next frame buttons
 	u.comparePrevButton = widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {})
@@ -207,6 +210,7 @@ func (u *Ui) NewUI() {
 
 	// Create entry and label for frame compare number tracking
 	u.compareFrameEntry = widget.NewEntry()
+	u.compareFrameEntry.SetText("1")
 	u.compareFrameLabel = widget.NewLabelWithData(binding.NewSprintf(
 		"of %d",
 		u.maxFrameBinding,
@@ -227,7 +231,7 @@ func (u *Ui) NewUI() {
 		)),
 		nil,
 		nil,
-		u.compareImage,
+		u.compareImages,
 	)
 
 	// Create window layout and set content
@@ -306,18 +310,6 @@ func (u *Ui) enableBottomWidgets() {
 		u.compareNextButton.Enable()
 		u.compareFrameEntry.Enable()
 	})
-}
-
-// Disables start button if paths are invalid
-func (u *Ui) validatePathEntries() {
-	referenceErr := u.referenceEntry.Validate()
-	distortedErr := u.distortedEntry.Validate()
-
-	if referenceErr == nil && distortedErr == nil {
-		fyne.Do(func() { u.startButton.Enable() })
-	} else {
-		fyne.Do(func() { u.startButton.Disable() })
-	}
 }
 
 // Show start button

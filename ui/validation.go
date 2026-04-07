@@ -3,6 +3,8 @@ package ui
 import (
 	"errors"
 	"os"
+
+	"fyne.io/fyne/v2"
 )
 
 // Custom entry validator to ensure path entered exists
@@ -21,4 +23,16 @@ func validateFileExists(path string) error {
 	}
 
 	return nil
+}
+
+// Disables start button if paths are invalid
+func (u *Ui) validatePathEntries() {
+	referenceErr := u.referenceEntry.Validate()
+	distortedErr := u.distortedEntry.Validate()
+
+	if referenceErr == nil && distortedErr == nil {
+		fyne.Do(func() { u.startButton.Enable() })
+	} else {
+		fyne.Do(func() { u.startButton.Disable() })
+	}
 }
