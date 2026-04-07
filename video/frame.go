@@ -61,11 +61,17 @@ func GetFramePair(
 	// Read all stdout to buffer
 	_, err = io.ReadFull(stdout, buf)
 	if err != nil {
+		if ctx.Err() != nil {
+			return nil, nil, ctx.Err()
+		}
 		return nil, nil, err
 	}
 
 	// Wait for command completion
 	if err := cmd.Wait(); err != nil {
+		if ctx.Err() != nil {
+			return nil, nil, ctx.Err()
+		}
 		return nil, nil, err
 	}
 

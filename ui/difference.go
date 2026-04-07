@@ -3,7 +3,7 @@ package ui
 import (
 	"VMAF-GUI/video"
 	"context"
-	"fmt"
+	"errors"
 	"strconv"
 	"unicode"
 
@@ -22,6 +22,10 @@ func (u *Ui) compareImageUpdateIndex(index int) {
 	ctx, cancel := context.WithCancel(context.Background())
 	u.compareCancel = cancel
 
+	// Increment request id
+	u.compareRequestId++
+	reqId := u.compareRequestId
+
 	go func() {
 		// Get frames
 		refImg, disImg, err := video.GetFramePair(
@@ -32,12 +36,21 @@ func (u *Ui) compareImageUpdateIndex(index int) {
 			index,
 		)
 		if err != nil {
-			fmt.Println("Error 1")
+			// Ignore context canceled errors
+			if errors.Is(err, context.Canceled) {
+				return
+			}
 			u.showError(err, false)
 			return
 		}
 
 		fyne.Do(func() {
+			// Drop stale results
+			// Run in ui thread to prevent race condition
+			if reqId != u.compareRequestId {
+				return
+			}
+
 			// Update compare image
 			u.compareImages.SetImages(refImg, disImg)
 		})
@@ -72,8 +85,6 @@ func (u *Ui) compareFrameEntryRestrict(s string) {
 		u.compareFrameEntry.SetText(new)
 		return
 	}
-
-	fmt.Println("Updating to frame: ", new)
 
 	// Update compare images with new entry value
 	u.compareImageUpdateIndex(val - 1)
