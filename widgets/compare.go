@@ -68,9 +68,9 @@ func (w *CompareWidget) Tapped(e *fyne.PointEvent) {
 }
 
 // Updates both images
-func (w *CompareWidget) SetImages(imgA, imgB image.Image) {
-	w.imgLeft = imgA
-	w.imgRight = imgB
+func (w *CompareWidget) SetImages(imgLeft, imgRight image.Image) {
+	w.imgLeft = imgLeft
+	w.imgRight = imgRight
 	w.Refresh()
 }
 
@@ -185,7 +185,7 @@ func (r *compareWidgetRenderer) generate(width, height int) image.Image {
 	// Draw vertical divider
 	for x := splitX - 1; x <= splitX+1; x++ {
 		if x >= 0 && x < width {
-			for y := 0; y < height; y++ {
+			for y := range height {
 				out.Set(x, y, dividerColour)
 			}
 		}
@@ -210,7 +210,7 @@ func (r *compareWidgetRenderer) generate(width, height int) image.Image {
 		if depth < 0 {
 			depth = -depth
 		}
-		for t := 0; t < thickness; t++ {
+		for t := range thickness {
 			set(splitX-offset+depth+t, cy+i) // Left chevron
 			set(splitX+offset-depth-t, cy+i) // Right chevron
 		}

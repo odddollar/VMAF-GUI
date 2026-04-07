@@ -98,6 +98,13 @@ func (u *Ui) run() {
 					return
 				}
 
+				// Get frames
+				refImg, disImg, err := video.GetFramePair(context.TODO(), u.referenceEntry.Text, u.distortedEntry.Text, refInfo, 0)
+				if err != nil {
+					u.showError(err, false)
+					return
+				}
+
 				fyne.Do(func() {
 					// Update results
 					u.resultsMeanBinding.Set(vmaf.PooledMetrics.VMAF.Mean)
@@ -107,6 +114,9 @@ func (u *Ui) run() {
 
 					// Update graph
 					u.resultsGraph.SetVMAF(vmaf)
+
+					// Update compare image
+					u.compareImage.SetImages(refImg, disImg)
 				})
 
 				return

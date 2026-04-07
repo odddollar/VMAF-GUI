@@ -10,23 +10,23 @@ import (
 )
 
 // Run vmaf calculation with progress updates
-func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan error, <-chan struct{}, error) {
+func RunVMAF(ctx context.Context, refPath, disPath string) (<-chan Progress, <-chan error, <-chan struct{}, error) {
 	// Create channel to push progress status through
 	progressChan := make(chan Progress)
 	errChan := make(chan error, 1)
 	doneChan := make(chan struct{})
 
 	// Get reference video info
-	refInfo, err := GetVideoInfo(ref)
+	refInfo, err := GetVideoInfo(refPath)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
 	// Create ffmpeg filter
 	filter := fmt.Sprintf(
-		"[0:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,scale=%d:%d:flags=bicubic,format=%s[dist];"+
+		"[0:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,scale=%d:%d:flags=bicubic,format=%s[dis];"+
 			"[1:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,format=%s[ref];"+
-			"[dist][ref]libvmaf=n_threads=8:log_path=vmaf.json:log_fmt=json",
+			"[dis][ref]libvmaf=n_threads=8:log_path=vmaf.json:log_fmt=json",
 		refInfo.FrameRate,
 		refInfo.Width, refInfo.Height,
 		refInfo.PixFmt,
@@ -41,8 +41,8 @@ func RunVMAF(ctx context.Context, ref, dist string) (<-chan Progress, <-chan err
 		"-hide_banner",
 		"-loglevel", "error",
 		"-stats",
-		"-i", dist,
-		"-i", ref,
+		"-i", disPath,
+		"-i", refPath,
 		"-lavfi", filter,
 		"-f", "null", "-",
 	)
