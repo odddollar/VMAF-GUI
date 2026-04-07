@@ -3,6 +3,7 @@ package ui
 import (
 	"VMAF-GUI/video"
 	"context"
+	"fmt"
 	"strconv"
 	"unicode"
 
@@ -11,28 +12,41 @@ import (
 
 // Get frame from index and update compare widget
 func (u *Ui) compareImageUpdateIndex(index int) {
-	// Get frames
-	refImg, disImg, err := video.GetFramePair(
-		context.TODO(),
-		u.referenceEntry.Text,
-		u.distortedEntry.Text,
-		u.refInfo,
-		index,
-	)
-	if err != nil {
-		u.showError(err, false)
-		return
+	// Cancel any currently running frame extractions
+	if u.compareCancel != nil {
+		u.compareCancel()
+		u.compareCancel = nil
 	}
 
-	fyne.Do(func() {
-		// Update compare image
-		u.compareImages.SetImages(refImg, disImg)
-	})
+	// Create context to allow getting frame cancelling
+	ctx, cancel := context.WithCancel(context.Background())
+	u.compareCancel = cancel
+
+	go func() {
+		// Get frames
+		refImg, disImg, err := video.GetFramePair(
+			ctx,
+			u.referenceEntry.Text,
+			u.distortedEntry.Text,
+			u.refInfo,
+			index,
+		)
+		if err != nil {
+			fmt.Println("Error 1")
+			u.showError(err, false)
+			return
+		}
+
+		fyne.Do(func() {
+			// Update compare image
+			u.compareImages.SetImages(refImg, disImg)
+		})
+	}()
 }
 
 // Ensures only numbers less than max frame count entered
 func (u *Ui) compareFrameEntryRestrict(s string) {
-	filtered := ""
+	var filtered string
 
 	// Restrict to digits only
 	for _, r := range s {
@@ -53,10 +67,16 @@ func (u *Ui) compareFrameEntryRestrict(s string) {
 
 	new := strconv.Itoa(val)
 
-	// Update content if changed
-	if s != new {
+	// Only update if different to prevent SetText calling OnChange again
+	if u.compareFrameEntry.Text != new {
 		u.compareFrameEntry.SetText(new)
+		return
 	}
+
+	fmt.Println("Updating to frame: ", new)
+
+	// Update compare images with new entry value
+	u.compareImageUpdateIndex(val - 1)
 }
 
 // Navigate to next frame

@@ -98,9 +98,6 @@ func (u *Ui) run() {
 					return
 				}
 
-				// Update compare widget to first frame
-				go u.compareImageUpdateIndex(0)
-
 				fyne.Do(func() {
 					// Update results
 					u.resultsMeanBinding.Set(vmaf.PooledMetrics.VMAF.Mean)
@@ -111,6 +108,9 @@ func (u *Ui) run() {
 					// Update graph
 					u.resultsGraph.SetVMAF(vmaf)
 				})
+
+				// Update compare widget to first frame
+				u.compareImageUpdateIndex(0)
 
 				return
 			}

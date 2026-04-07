@@ -66,6 +66,9 @@ type Ui struct {
 	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
 
+	// Allows cancelling in-progress frame extraction
+	compareCancel context.CancelFunc
+
 	// Store information for current reference file
 	refInfo video.VideoInfo
 }
