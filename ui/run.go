@@ -99,7 +99,7 @@ func (u *Ui) run() {
 				}
 
 				// Update compare widget to first frame
-				go u.updateCompareImageIndex(0)
+				go u.compareImageUpdateIndex(0)
 
 				fyne.Do(func() {
 					// Update results

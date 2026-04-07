@@ -205,13 +205,13 @@ func (u *Ui) NewUI() {
 	u.compareImages = widgets.NewCompareWidget(image.Black, image.Black)
 
 	// Create previous and next frame buttons
-	u.comparePrevButton = widget.NewButtonWithIcon("", theme.NavigateBackIcon(), func() {})
-	u.compareNextButton = widget.NewButtonWithIcon("", theme.NavigateNextIcon(), func() {})
+	u.comparePrevButton = widget.NewButtonWithIcon("", theme.NavigateBackIcon(), u.compareFrameEntryPrev)
+	u.compareNextButton = widget.NewButtonWithIcon("", theme.NavigateNextIcon(), u.compareFrameEntryNext)
 
 	// Create entry that only allows digits
 	u.compareFrameEntry = widget.NewEntry()
 	u.compareFrameEntry.SetText("1")
-	u.compareFrameEntry.OnChanged = u.restrictCompareFrameEntry
+	u.compareFrameEntry.OnChanged = u.compareFrameEntryRestrict
 
 	// Create dynamic label for max frame number
 	u.compareFrameLabel = widget.NewLabelWithData(binding.NewSprintf(
