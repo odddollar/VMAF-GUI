@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"image"
-	"image/color"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -96,7 +95,7 @@ func (u *Ui) NewUI() {
 	u.resultsMaxBinding = binding.NewFloat()
 
 	// Create title widget
-	u.titleLabel = canvas.NewText("VMAF GUI", color.Black)
+	u.titleLabel = canvas.NewText("VMAF GUI", theme.Color(theme.ColorNameForeground))
 	u.titleLabel.Alignment = fyne.TextAlignCenter
 	u.titleLabel.TextStyle.Bold = true
 	u.titleLabel.TextSize = 20
