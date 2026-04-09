@@ -133,7 +133,7 @@ func (u *Ui) NewUI() {
 		"vmaf_v0.6.1",
 		"vmaf_4k_v0.6.1",
 		"vmaf_v0.6.1neg",
-		"vmaf_4k_v0.6.1neg.json",
+		"vmaf_4k_v0.6.1neg",
 	}, func(s string) {})
 	u.modelDropdown.SetSelectedIndex(0)
 
@@ -327,6 +327,8 @@ func (u *Ui) disableRunningWidgets() {
 		u.distortedEntry.Disable()
 		u.referenceButton.Disable()
 		u.distortedButton.Disable()
+		u.modelDropdown.Disable()
+		u.modelInfoButton.Disable()
 		u.deleteOutputCheck.Disable()
 	})
 }
@@ -338,6 +340,8 @@ func (u *Ui) enableRunningWidgets() {
 		u.distortedEntry.Enable()
 		u.referenceButton.Enable()
 		u.distortedButton.Enable()
+		u.modelDropdown.Enable()
+		u.modelInfoButton.Enable()
 		u.deleteOutputCheck.Enable()
 	})
 }

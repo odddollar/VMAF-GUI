@@ -10,7 +10,7 @@ import (
 )
 
 // Run vmaf calculation with progress updates
-func RunVMAF(ctx context.Context, refPath, disPath string) (<-chan Progress, <-chan error, <-chan struct{}, error) {
+func RunVMAF(ctx context.Context, refPath, disPath string, model string) (<-chan Progress, <-chan error, <-chan struct{}, error) {
 	// Create channel to push progress status through
 	progressChan := make(chan Progress)
 	errChan := make(chan error, 1)
@@ -26,13 +26,14 @@ func RunVMAF(ctx context.Context, refPath, disPath string) (<-chan Progress, <-c
 	filter := fmt.Sprintf(
 		"[0:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,scale=%d:%d:flags=bicubic,format=%s[dis];"+
 			"[1:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,scale=%d:%d:flags=bicubic,format=%s[ref];"+
-			"[dis][ref]libvmaf=n_threads=8:log_path=vmaf.json:log_fmt=json",
+			"[dis][ref]libvmaf=n_threads=8:log_path=vmaf.json:log_fmt=json:model=version=%s",
 		refInfo.FrameRate,
 		refInfo.Width, refInfo.Height,
 		refInfo.PixFmt,
 		refInfo.FrameRate,
 		refInfo.Width, refInfo.Height,
 		refInfo.PixFmt,
+		model,
 	)
 
 	// Create ffmpeg command to run vmaf calculation

@@ -10,8 +10,12 @@ import (
 
 // Perform checks and run vmaf calculation
 func (u *Ui) run() {
+	// Get paths
+	refPath := u.referenceEntry.Text
+	disPath := u.distortedEntry.Text
+
 	// Ensure matching video info
-	same, err := video.SameVideoInfo(u.referenceEntry.Text, u.distortedEntry.Text)
+	same, err := video.SameVideoInfo(refPath, disPath)
 	if !same || err != nil {
 		u.showError(err, false)
 		return
@@ -24,7 +28,7 @@ func (u *Ui) run() {
 	u.resetState()
 
 	// Get reference info to update progress bar maximum
-	u.refInfo, err = video.GetVideoInfo(u.referenceEntry.Text)
+	u.refInfo, err = video.GetVideoInfo(refPath)
 	if err != nil {
 		u.showErrorAndReset(err, false)
 		return
@@ -51,7 +55,7 @@ func (u *Ui) run() {
 	})
 
 	// Start vmaf with channels
-	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, u.referenceEntry.Text, u.distortedEntry.Text)
+	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, refPath, disPath, u.modelDropdown.Selected)
 	if err != nil {
 		u.showErrorAndReset(err, false)
 		return
