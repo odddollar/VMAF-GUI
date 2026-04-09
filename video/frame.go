@@ -18,15 +18,11 @@ func GetFramePair(
 ) (*image.NRGBA, *image.NRGBA, error) {
 	// Filter options to normalise and output raw rgb frames
 	filter := fmt.Sprintf(
-		"[0:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,scale=%d:%d:flags=bicubic,format=rgb24[dis];"+
-			"[1:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,scale=%d:%d:flags=bicubic,format=rgb24[ref];"+
-			"[dis]trim=start_frame=%d:end_frame=%d[dis_t];"+
-			"[ref]trim=start_frame=%d:end_frame=%d[ref_t];"+
-			"[dis_t][ref_t]concat=n=2:v=1:a=0[out]",
-		refInfo.FrameRate, refInfo.Width, refInfo.Height,
-		refInfo.FrameRate, refInfo.Width, refInfo.Height,
-		frameIndex, frameIndex+1,
-		frameIndex, frameIndex+1,
+		"[0:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,scale=%d:%d:flags=bicubic,format=rgb24,select=eq(n\\,%d)[dis];"+
+			"[1:v]settb=AVTB,setpts=PTS-STARTPTS,fps=%s,scale=%d:%d:flags=bicubic,format=rgb24,select=eq(n\\,%d)[ref];"+
+			"[dis][ref]concat=n=2:v=1:a=0[out]",
+		refInfo.FrameRate, refInfo.Width, refInfo.Height, frameIndex,
+		refInfo.FrameRate, refInfo.Width, refInfo.Height, frameIndex,
 	)
 
 	// Run for both videos simultaneously and output over pipes
