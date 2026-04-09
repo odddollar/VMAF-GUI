@@ -51,6 +51,9 @@ func (u *Ui) compareImageUpdateIndex(index int) {
 				return
 			}
 
+			// Update compare vmaf score
+			u.compareVmafBinding.Set(u.vmafScores.Frames[index].Metrics.VMAF)
+
 			// Update compare image
 			u.compareImages.SetImages(refImg, disImg)
 		})

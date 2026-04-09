@@ -97,16 +97,17 @@ func (u *Ui) run() {
 					u.showError(err, false)
 					return
 				}
+				u.vmafScores = vmaf
 
 				fyne.Do(func() {
 					// Update results
-					u.resultsMeanBinding.Set(vmaf.PooledMetrics.VMAF.Mean)
-					u.resultsHarmonicMeanBinding.Set(vmaf.PooledMetrics.VMAF.HarmonicMean)
-					u.resultsMinBinding.Set(vmaf.PooledMetrics.VMAF.Min)
-					u.resultsMaxBinding.Set(vmaf.PooledMetrics.VMAF.Max)
+					u.resultsMeanBinding.Set(u.vmafScores.PooledMetrics.VMAF.Mean)
+					u.resultsHarmonicMeanBinding.Set(u.vmafScores.PooledMetrics.VMAF.HarmonicMean)
+					u.resultsMinBinding.Set(u.vmafScores.PooledMetrics.VMAF.Min)
+					u.resultsMaxBinding.Set(u.vmafScores.PooledMetrics.VMAF.Max)
 
 					// Update graph
-					u.resultsGraph.SetVMAF(vmaf)
+					u.resultsGraph.SetVMAF(u.vmafScores)
 				})
 
 				// Update compare widget to first frame

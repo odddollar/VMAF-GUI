@@ -36,6 +36,9 @@ type Ui struct {
 	resultsMinBinding          binding.Float
 	resultsMaxBinding          binding.Float
 
+	// Bindings for compare vmaf display
+	compareVmafBinding binding.Float
+
 	// Main UI elements
 	titleLabel        *canvas.Text
 	referenceEntry    *widget.Entry
@@ -56,11 +59,12 @@ type Ui struct {
 	resultsFrameCountLabels *fyne.Container
 
 	// Compare tab elements
-	compareImages     *widgets.CompareWidget
-	comparePrevButton *widget.Button
-	compareNextButton *widget.Button
-	compareFrameEntry *widget.Entry
-	compareFrameLabel *widget.Label
+	compareResultsLabel *widget.Label
+	compareImages       *widgets.CompareWidget
+	comparePrevButton   *widget.Button
+	compareNextButton   *widget.Button
+	compareFrameEntry   *widget.Entry
+	compareFrameLabel   *widget.Label
 
 	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
@@ -71,6 +75,9 @@ type Ui struct {
 
 	// Store information for current reference file
 	refInfo video.VideoInfo
+
+	// Store most recent vmaf scores
+	vmafScores video.VMAFOutput
 }
 
 func (u *Ui) NewUI() {
@@ -93,6 +100,9 @@ func (u *Ui) NewUI() {
 	u.resultsHarmonicMeanBinding = binding.NewFloat()
 	u.resultsMinBinding = binding.NewFloat()
 	u.resultsMaxBinding = binding.NewFloat()
+
+	// Create bindings for compare vmaf
+	u.compareVmafBinding = binding.NewFloat()
 
 	// Create title widget
 	u.titleLabel = canvas.NewText("VMAF GUI", theme.Color(theme.ColorNameForeground))
@@ -204,6 +214,14 @@ func (u *Ui) NewUI() {
 		u.resultsGraph,
 	)
 
+	// Create compare vmaf label
+	compareVmafText := binding.NewSprintf(
+		"Frame VMAF: %.2f",
+		u.compareVmafBinding,
+	)
+	u.compareResultsLabel = widget.NewLabelWithData(compareVmafText)
+	u.compareResultsLabel.TextStyle.Monospace = true
+
 	// Create compare image widget
 	u.compareImages = widgets.NewCompareWidget(image.Black, image.Black)
 
@@ -225,7 +243,11 @@ func (u *Ui) NewUI() {
 
 	// Compare tab elements
 	compareTabElements := container.NewBorder(
-		nil,
+		container.NewHBox(
+			layout.NewSpacer(),
+			u.compareResultsLabel,
+			layout.NewSpacer(),
+		),
 		container.NewCenter(container.NewHBox(
 			u.comparePrevButton,
 			container.NewGridWrap( // Expand width of entry
