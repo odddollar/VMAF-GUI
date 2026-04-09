@@ -72,9 +72,9 @@ func GetVideoInfo(path string) (VideoInfo, error) {
 	)
 
 	// Get command output
-	out, err := cmd.Output()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return VideoInfo{}, err
+		return VideoInfo{}, fmt.Errorf("%v: %s", err, string(out))
 	}
 
 	// Unmarshal to struct
@@ -85,7 +85,7 @@ func GetVideoInfo(path string) (VideoInfo, error) {
 
 	// Ensure only one video stream exists
 	if len(res.Streams) != 1 {
-		return VideoInfo{}, fmt.Errorf("only one video stream permitted in file: %s", path)
+		return VideoInfo{}, fmt.Errorf("expected exactly one video stream, but found none or multiple in file: %s", path)
 	}
 
 	// Ensure resolution exists
