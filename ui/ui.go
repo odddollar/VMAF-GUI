@@ -45,6 +45,8 @@ type Ui struct {
 	distortedEntry    *widget.Entry
 	referenceButton   *widget.Button
 	distortedButton   *widget.Button
+	modelDropdown     *widget.Select
+	modelInfoButton   *widget.Button
 	startButton       *widget.Button
 	stopButton        *widget.Button
 	deleteOutputCheck *widget.Check
@@ -126,6 +128,18 @@ func (u *Ui) NewUI() {
 	u.referenceButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile(u.referenceEntry) })
 	u.distortedButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile(u.distortedEntry) })
 
+	// Create model selection dropdown
+	u.modelDropdown = widget.NewSelect([]string{
+		"vmaf_v0.6.1",
+		"vmaf_4k_v0.6.1",
+		"vmaf_v0.6.1neg",
+		"vmaf_4k_v0.6.1neg.json",
+	}, func(s string) {})
+	u.modelDropdown.SetSelectedIndex(0)
+
+	// Create model info button
+	u.modelInfoButton = widget.NewButtonWithIcon("", theme.InfoIcon(), func() {})
+
 	// Create start button
 	u.startButton = widget.NewButton("Start", func() { go u.run() })
 	u.startButton.Importance = widget.HighImportance
@@ -166,6 +180,12 @@ func (u *Ui) NewUI() {
 				container.NewBorder(nil, nil, nil,
 					u.distortedButton,
 					u.distortedEntry,
+				),
+			),
+			widget.NewFormItem("VMAF model",
+				container.NewBorder(nil, nil, nil,
+					u.modelInfoButton,
+					u.modelDropdown,
 				),
 			),
 		),
