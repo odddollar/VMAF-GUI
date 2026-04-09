@@ -138,7 +138,7 @@ func (u *Ui) NewUI() {
 	u.modelDropdown.SetSelectedIndex(0)
 
 	// Create model info button
-	u.modelInfoButton = widget.NewButtonWithIcon("", theme.InfoIcon(), func() {})
+	u.modelInfoButton = widget.NewButtonWithIcon("", theme.InfoIcon(), u.showModelInfo)
 
 	// Create start button
 	u.startButton = widget.NewButton("Start", func() { go u.run() })
