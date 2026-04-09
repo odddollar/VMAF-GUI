@@ -48,6 +48,20 @@ func GetFramePair(
 		return nil, nil, err
 	}
 
+	// Read command errors
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Read stderr concurrently
+	var stderrBuf []byte
+	done := make(chan struct{})
+	go func() {
+		stderrBuf, _ = io.ReadAll(stderr)
+		close(done)
+	}()
+
 	// Start command
 	if err := cmd.Start(); err != nil {
 		return nil, nil, err
@@ -64,16 +78,21 @@ func GetFramePair(
 		if ctx.Err() != nil {
 			return nil, nil, ctx.Err()
 		}
-		return nil, nil, err
+		<-done
+		return nil, nil, fmt.Errorf("%v: %s", err, string(stderrBuf))
 	}
 
 	// Wait for command completion
 	if err := cmd.Wait(); err != nil {
+		<-done
 		if ctx.Err() != nil {
 			return nil, nil, ctx.Err()
 		}
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("%v: %s", err, string(stderrBuf))
 	}
+
+	// Ensure stderr fully read
+	<-done
 
 	// Split buffers
 	disBuf := buf[:frameSize]

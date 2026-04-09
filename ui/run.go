@@ -17,7 +17,7 @@ func (u *Ui) run() {
 	// Ensure matching video info
 	same, err := video.SameVideoInfo(refPath, disPath)
 	if !same || err != nil {
-		u.showError(err, false)
+		u.showErrorAndReset(err, false)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (u *Ui) run() {
 				// Parse vmaf results and store
 				vmaf, err := video.ParseJsonOutput("vmaf.json", u.deleteOutputCheck.Checked)
 				if err != nil {
-					u.showError(err, false)
+					u.showErrorAndReset(err, false)
 					return
 				}
 				u.vmafScores = vmaf
