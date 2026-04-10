@@ -46,3 +46,7 @@ upx --ultra-brute "VMAF GUI.exe"
 
 ## Screenshots
 
+<div align="center">
+    <img src="./screenshots/Results.png" alt="Results"><br><br>
+    <img src="./screenshots/Compare.png" alt="Compare">
+</div>
