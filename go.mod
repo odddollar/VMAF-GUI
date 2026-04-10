@@ -4,6 +4,7 @@ go 1.25.4
 
 require (
 	fyne.io/fyne/v2 v2.7.3
+	fyne.io/x/fyne v0.0.0-20260404122735-cbbdf562353e
 	golang.org/x/image v0.24.0
 )
 
@@ -26,7 +27,6 @@ require (
 	github.com/hack-pad/safejs v0.1.0 // indirect
 	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade // indirect
 	github.com/jsummers/gobmp v0.0.0-20230614200233-a9de23ed2e25 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.5.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

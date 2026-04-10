@@ -41,6 +41,7 @@ type Ui struct {
 
 	// Main UI elements
 	titleLabel        *canvas.Text
+	aboutButton       *widget.Button
 	referenceEntry    *widget.Entry
 	distortedEntry    *widget.Entry
 	referenceButton   *widget.Button
@@ -112,6 +113,9 @@ func (u *Ui) NewUI() {
 	u.titleLabel.TextStyle.Bold = true
 	u.titleLabel.TextSize = 20
 
+	// Create about button
+	u.aboutButton = widget.NewButtonWithIcon("", theme.InfoIcon(), u.showAbout)
+
 	// Create file path widgets
 	u.referenceEntry = widget.NewEntry()
 	u.referenceEntry.Validator = validateFileExists
@@ -140,7 +144,7 @@ func (u *Ui) NewUI() {
 	u.modelDropdown.SetSelectedIndex(0)
 
 	// Create model info button
-	u.modelInfoButton = widget.NewButtonWithIcon("", theme.InfoIcon(), u.showModelInfo)
+	u.modelInfoButton = widget.NewButtonWithIcon("Models", theme.InfoIcon(), u.showModelInfo)
 
 	// Create start button
 	u.startButton = widget.NewButton("Start", func() { go u.run() })
@@ -170,7 +174,13 @@ func (u *Ui) NewUI() {
 
 	// Top main UI elements
 	topElements := container.NewVBox(
-		u.titleLabel,
+		container.NewBorder(
+			nil,
+			nil,
+			widgets.NewSpacer(widget.NewButtonWithIcon("", theme.InfoIcon(), func() {}).MinSize()), // Keeps title centred
+			u.aboutButton,
+			u.titleLabel,
+		),
 		widget.NewForm(
 			widget.NewFormItem("Reference file",
 				container.NewBorder(nil, nil, nil,
