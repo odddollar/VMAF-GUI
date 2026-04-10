@@ -41,7 +41,7 @@ func newFrameScale(maxFrameBinding binding.Int) *fyne.Container {
 	t.TextStyle.Bold = true
 	spacer := widgets.NewSpacer(t.MinSize())
 
-	left := canvas.NewText("0", theme.Color(theme.ColorNameForeground))
+	left := canvas.NewText("1", theme.Color(theme.ColorNameForeground))
 	left.Alignment = fyne.TextAlignLeading
 	left.TextStyle.Bold = true
 
