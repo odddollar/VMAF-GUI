@@ -300,7 +300,7 @@ func (u *Ui) NewUI() {
 func (u *Ui) Run() {
 	u.w.Resize(fyne.NewSize(800, 0))
 	u.w.Show()
-	u.startupChecks()
+	go u.startupChecks()
 	u.a.Run()
 }
 

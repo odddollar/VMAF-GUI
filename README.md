@@ -4,9 +4,24 @@ A clean and simple graphical user interface for [Netflix's VMAF](https://github.
 
 VMAF is extremely useful for comparing the perceptual quality of a compressed video to its source/reference, but the command to run it is often long and annoying to write. This program offers a reproducible way of running VMAF for multiple video files, with additional quality-of-life features.
 
+> [!IMPORTANT]
+>
+> This program requires access to the `ffmpeg` and `ffprobe` commands, which can be downloaded from the [FFmpeg website](https://ffmpeg.org/) and added to the system `PATH` variable. FFmpeg is also required to have `libvmaf` included. A start-up check is performed when this program is launched to ensure it can access these commands.
+
 ## Features
 
-
+- Select `reference` and `distorted` video files to calculate their VMAF score
+- Score calculated without decompressing the videos to `yuv` files
+  - FFmpeg allows passing the video stream to VMAF without decompressing it to disk first, greatly reducing storage requirements
+- Fast CPU-based processing
+- Selectable VMAF models (`vmaf_v0.6.1`, `vmaf_4k_v0.6.1`, `vmaf_v0.6.1neg`, `vmaf_4k_v0.6.1neg`)
+  - Information button to show details about which model is best suited for which situation
+- Live progress updates
+- Ability to keep the raw FFmpeg `json` output after the calculation has completed
+- Graphing VMAF scores across the duration of the video
+  - Hover over the graph to display a tooltip of the hovered frame number and its score
+- Compare the same frame between reference and distorted videos with an image slider
+  - Enter the desired frame number and move the slider back and forth over the image to transition between reference and distorted frames
 
 ## Building
 
