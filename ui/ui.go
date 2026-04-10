@@ -117,11 +117,13 @@ func (u *Ui) NewUI() {
 	u.referenceEntry.Validator = validateFileExists
 	u.referenceEntry.OnChanged = func(s string) {
 		u.validatePathEntries()
+		u.disableBottomWidgets()
 	}
 	u.distortedEntry = widget.NewEntry()
 	u.distortedEntry.Validator = validateFileExists
 	u.distortedEntry.OnChanged = func(s string) {
 		u.validatePathEntries()
+		u.disableBottomWidgets()
 	}
 
 	// Create file explore buttons
