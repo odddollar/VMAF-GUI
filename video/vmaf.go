@@ -55,6 +55,10 @@ func RunVMAF(ctx context.Context, refPath, disPath string, model string) (<-chan
 		return nil, nil, nil, err
 	}
 
+	// Buffer to capture full stderr
+	var stderrBuf bytes.Buffer
+	tee := io.TeeReader(stderr, &stderrBuf)
+
 	// Start ffmpeg
 	if err := cmd.Start(); err != nil {
 		return nil, nil, nil, err
@@ -66,7 +70,7 @@ func RunVMAF(ctx context.Context, refPath, disPath string, model string) (<-chan
 		var sentErr bool // Ensures at most one error sent
 
 		// Read from command output
-		r := bufio.NewReader(stderr)
+		r := bufio.NewReader(tee)
 		var buf bytes.Buffer
 
 		for {
@@ -81,7 +85,7 @@ func RunVMAF(ctx context.Context, refPath, disPath string, model string) (<-chan
 				// Send read errors that aren't no more data
 				if err != io.EOF {
 					sentErr = true
-					errChan <- err
+					errChan <- fmt.Errorf("read error: %v, stderr: %s", err, stderrBuf.String())
 				}
 				break
 			}
@@ -113,7 +117,7 @@ func RunVMAF(ctx context.Context, refPath, disPath string, model string) (<-chan
 				return
 			}
 
-			errChan <- err
+			errChan <- fmt.Errorf("command error: %v, stderr: %s", err, stderrBuf.String())
 			return
 		}
 
