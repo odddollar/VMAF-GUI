@@ -48,6 +48,7 @@ func RunVMAF(ctx context.Context, refPath, disPath string, model string) (<-chan
 		"-lavfi", filter,
 		"-f", "null", "-",
 	)
+	hideCmdWindow(cmd)
 
 	// Command will output over stderr
 	stderr, err := cmd.StderrPipe()

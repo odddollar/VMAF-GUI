@@ -70,6 +70,7 @@ func GetVideoInfo(path string) (VideoInfo, error) {
 		"-of", "json",
 		path,
 	)
+	hideCmdWindow(cmd)
 
 	// Get command output
 	out, err := cmd.CombinedOutput()

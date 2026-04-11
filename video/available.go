@@ -14,6 +14,7 @@ func CommandAvailable(command string) bool {
 // Check if vmaf available in ffmpeg
 func VMAFAvailable() bool {
 	cmd := exec.Command("ffmpeg", "-filters")
+	hideCmdWindow(cmd)
 
 	// Get command output
 	out, err := cmd.Output()

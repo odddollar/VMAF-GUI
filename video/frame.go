@@ -41,6 +41,7 @@ func GetFramePair(
 		"-pix_fmt", "rgb24",
 		"pipe:1",
 	)
+	hideCmdWindow(cmd)
 
 	// Will receive both frames as single buffer
 	stdout, err := cmd.StdoutPipe()
