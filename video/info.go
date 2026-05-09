@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strconv"
+	"strings"
 )
 
 type VideoInfo struct {
@@ -103,7 +104,29 @@ func GetVideoInfo(path string) (VideoInfo, error) {
 	// Ensure frame count exists
 	i, err := strconv.Atoi(res.Streams[0].FrameCount)
 	if err != nil || i == 0 {
-		return VideoInfo{}, fmt.Errorf("unable to get frame count of file: %s", path)
+		// Fallback to counting frames directly
+		cmd = exec.Command(
+			"ffprobe",
+			"-v", "error",
+			"-select_streams", "v:0",
+			"-count_frames",
+			"-show_entries", "stream=nb_read_frames",
+			"-of", "default=nokey=1:noprint_wrappers=1",
+			path,
+		)
+		hideCmdWindow(cmd)
+
+		out, err = cmd.CombinedOutput()
+		if err != nil {
+			return VideoInfo{}, fmt.Errorf("%v: %s", err, string(out))
+		}
+
+		i, err = strconv.Atoi(strings.TrimSpace(string(out)))
+		if err != nil || i == 0 {
+			return VideoInfo{}, fmt.Errorf("unable to get frame count of file: %s", path)
+		}
+
+		res.Streams[0].FrameCount = strconv.Itoa(i)
 	}
 
 	// Ensure pixel format exists
