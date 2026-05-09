@@ -10,17 +10,11 @@ import (
 )
 
 // Run vmaf calculation with progress updates
-func RunVMAF(ctx context.Context, refPath, disPath string, model string) (<-chan Progress, <-chan error, <-chan struct{}, error) {
+func RunVMAF(ctx context.Context, refPath, disPath string, model string, refInfo VideoInfo) (<-chan Progress, <-chan error, <-chan struct{}, error) {
 	// Create channel to push progress status through
 	progressChan := make(chan Progress)
 	errChan := make(chan error, 1)
 	doneChan := make(chan struct{})
-
-	// Get reference video info
-	refInfo, err := GetVideoInfo(refPath)
-	if err != nil {
-		return nil, nil, nil, err
-	}
 
 	// Create ffmpeg filter
 	filter := fmt.Sprintf(

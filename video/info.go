@@ -20,23 +20,23 @@ type VideoInfo struct {
 // Must be same frame rate and frame count as frames must align for comparisons
 // Frame rate will be normalised to reference's to enforce CFR
 // Resolution and pixel format also normalised to reference's
-func SameVideoInfo(refPath, disPath string) (bool, error) {
+func SameVideoInfo(refPath, disPath string) (bool, VideoInfo, error) {
 	// Get video information
 	refInfo, err := GetVideoInfo(refPath)
 	if err != nil {
-		return false, err
+		return false, VideoInfo{}, err
 	}
 
 	disInfo, err := GetVideoInfo(disPath)
 	if err != nil {
-		return false, err
+		return false, VideoInfo{}, err
 	}
 
 	// Compare frame rate strings
 	refFPS, _ := parseFPS(refInfo.FrameRate)
 	disFPS, _ := parseFPS(disInfo.FrameRate)
 	if refFPS != disFPS {
-		return false, fmt.Errorf(
+		return false, VideoInfo{}, fmt.Errorf(
 			"reference and distorted files have different framerates: %s, %s",
 			refInfo.FrameRate,
 			disInfo.FrameRate,
@@ -45,14 +45,14 @@ func SameVideoInfo(refPath, disPath string) (bool, error) {
 
 	// Compare frame count
 	if refInfo.FrameCount != disInfo.FrameCount {
-		return false, fmt.Errorf(
+		return false, VideoInfo{}, fmt.Errorf(
 			"reference and distorted files have different frame counts: %s, %s",
 			refInfo.FrameCount,
 			disInfo.FrameCount,
 		)
 	}
 
-	return true, nil
+	return true, refInfo, nil
 }
 
 // Get information of video

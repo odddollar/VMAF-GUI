@@ -21,18 +21,14 @@ func (u *Ui) run() {
 	u.resetState()
 
 	// Ensure matching video info
-	same, err := video.SameVideoInfo(refPath, disPath)
+	same, refInfo, err := video.SameVideoInfo(refPath, disPath)
 	if !same || err != nil {
 		u.showErrorAndReset(err, false)
 		return
 	}
 
 	// Get reference info to update progress bar maximum
-	u.refInfo, err = video.GetVideoInfo(refPath)
-	if err != nil {
-		u.showErrorAndReset(err, false)
-		return
-	}
+	u.refInfo = refInfo
 	frameCount, err := strconv.ParseFloat(u.refInfo.FrameCount, 64)
 	if err != nil {
 		u.showErrorAndReset(err, false)
@@ -55,7 +51,7 @@ func (u *Ui) run() {
 	})
 
 	// Start vmaf with channels
-	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, refPath, disPath, u.modelDropdown.Selected)
+	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, refPath, disPath, u.modelDropdown.Selected, u.refInfo)
 	if err != nil {
 		u.showErrorAndReset(err, false)
 		return
