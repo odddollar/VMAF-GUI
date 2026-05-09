@@ -2,5 +2,5 @@
 Icon = "Icon.png"
 Name = "VMAF GUI"
 ID = "com.vmaf-gui.odddollar"
-Version = "1.0.1"
-Build = 7
+Version = "1.0.2"
+Build = 8
