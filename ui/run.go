@@ -14,18 +14,18 @@ func (u *Ui) run() {
 	refPath := u.referenceEntry.Text
 	disPath := u.distortedEntry.Text
 
+	// Switch which button visible and clear progress
+	u.disableRunningWidgets()
+	u.disableBottomWidgets()
+	u.showStopButton()
+	u.resetState()
+
 	// Ensure matching video info
 	same, err := video.SameVideoInfo(refPath, disPath)
 	if !same || err != nil {
 		u.showErrorAndReset(err, false)
 		return
 	}
-
-	// Switch which button visible and clear progress
-	u.disableRunningWidgets()
-	u.disableBottomWidgets()
-	u.showStopButton()
-	u.resetState()
 
 	// Get reference info to update progress bar maximum
 	u.refInfo, err = video.GetVideoInfo(refPath)
