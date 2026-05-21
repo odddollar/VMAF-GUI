@@ -31,7 +31,7 @@ func (u *Ui) compareImageUpdateIndex(index int) {
 	reqId := u.compareRequestId
 
 	// Log getting frames
-	u.logger.Printf("INFO: Getting frame %d from \"%s\" (reference) and \"%s\" (distorted)", index+1, refPath, disPath)
+	u.logger.Printf("INFO: getting frame %d from \"%s\" (reference) and \"%s\" (distorted)", index+1, refPath, disPath)
 
 	go func() {
 		// Get frames
@@ -59,7 +59,7 @@ func (u *Ui) compareImageUpdateIndex(index int) {
 			}
 
 			// Log frame score and image update
-			u.logger.Printf("INFO: Updating compare view to frame %d of \"%s\" (reference) and \"%s\" (distorted)", index+1, refPath, disPath)
+			u.logger.Printf("INFO: updating compare view to frame %d of \"%s\" (reference) and \"%s\" (distorted)", index+1, refPath, disPath)
 
 			// Update compare vmaf score
 			u.compareVmafBinding.Set(u.vmafScores.Frames[index].Metrics.VMAF)

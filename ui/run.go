@@ -21,7 +21,7 @@ func (u *Ui) run() {
 	u.resetState()
 
 	// Log checking video info
-	u.logger.Printf("INFO: Comparing video properties of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
+	u.logger.Printf("INFO: comparing video properties of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
 
 	// Ensure matching video info
 	same, refInfo, err := video.SameVideoInfo(u.logger, refPath, disPath)
@@ -54,7 +54,7 @@ func (u *Ui) run() {
 	})
 
 	// Log starting
-	u.logger.Printf("INFO: Starting calculation with \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
+	u.logger.Printf("INFO: starting calculation with \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
 
 	// Start vmaf with channels
 	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, refPath, disPath, u.modelDropdown.Selected, u.refInfo)
@@ -98,8 +98,8 @@ func (u *Ui) run() {
 				u.showStartButton()
 
 				// Log success
-				u.logger.Printf("INFO: Successfully calculated VMAF of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
-				u.logger.Printf("INFO: Parsing contents of \"vmaf.json\"")
+				u.logger.Printf("INFO: successfully calculated VMAF of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
+				u.logger.Printf("INFO: parsing contents of \"vmaf.json\"")
 
 				// Parse vmaf results and store
 				vmaf, err := video.ParseJsonOutput("vmaf.json", u.deleteOutputCheck.Checked)
@@ -110,7 +110,7 @@ func (u *Ui) run() {
 				u.vmafScores = vmaf
 
 				// Log updating results
-				u.logger.Printf("INFO: Updating VMAF results and graph")
+				u.logger.Printf("INFO: updating VMAF results and graph")
 
 				fyne.Do(func() {
 					// Update results

@@ -106,7 +106,7 @@ func getVideoInfo(logger *log.Logger, path string) (VideoInfo, error) {
 	i, err := strconv.Atoi(res.Streams[0].FrameCount)
 	if err != nil || i == 0 {
 		// Log fallback
-		logger.Printf("INFO: Failed to get frame count of \"%s\". Falling back to FFprobe frame counting", path)
+		logger.Printf("INFO: failed to get frame count of \"%s\". Falling back to FFprobe frame counting", path)
 
 		// Fallback to counting frames directly
 		cmd = exec.Command(

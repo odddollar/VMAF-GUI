@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
 )
@@ -9,6 +11,13 @@ import (
 
 // Standard dialog to show error
 func (u *Ui) showError(err error, fatal bool) {
+	// Log error skipping stack frames
+	msg := fmt.Sprintf("ERROR: %v", err)
+	if fatal {
+		msg = fmt.Sprintf("FATAL: %v", err)
+	}
+	u.logger.Output(3, msg)
+
 	fyne.Do(func() {
 		d := dialog.NewError(err, u.w)
 
@@ -17,12 +26,6 @@ func (u *Ui) showError(err error, fatal bool) {
 			d.SetOnClosed(func() {
 				u.a.Quit()
 			})
-
-			// Log fatal error
-			u.logger.Printf("FATAL: %v", err)
-		} else {
-			// Log regular error
-			u.logger.Printf("ERROR: %v", err)
 		}
 
 		d.Show()
