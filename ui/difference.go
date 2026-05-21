@@ -12,6 +12,10 @@ import (
 
 // Get frame from index and update compare widget
 func (u *Ui) compareImageUpdateIndex(index int) {
+	// Get paths
+	refPath := u.referenceEntry.Text
+	disPath := u.distortedEntry.Text
+
 	// Cancel any currently running frame extractions
 	if u.compareCancel != nil {
 		u.compareCancel()
@@ -26,12 +30,15 @@ func (u *Ui) compareImageUpdateIndex(index int) {
 	u.compareRequestId++
 	reqId := u.compareRequestId
 
+	// Log getting frames
+	u.logger.Printf("INFO: Getting frame %d from \"%s\" (reference) and \"%s\" (distorted)", index+1, refPath, disPath)
+
 	go func() {
 		// Get frames
 		refImg, disImg, err := video.GetFramePair(
 			ctx,
-			u.referenceEntry.Text,
-			u.distortedEntry.Text,
+			refPath,
+			disPath,
 			u.refInfo,
 			index,
 		)
@@ -50,6 +57,9 @@ func (u *Ui) compareImageUpdateIndex(index int) {
 			if reqId != u.compareRequestId {
 				return
 			}
+
+			// Log frame score and image update
+			u.logger.Printf("INFO: Updating compare view to frame %d of \"%s\" (reference) and \"%s\" (distorted)", index+1, refPath, disPath)
 
 			// Update compare vmaf score
 			u.compareVmafBinding.Set(u.vmafScores.Frames[index].Metrics.VMAF)

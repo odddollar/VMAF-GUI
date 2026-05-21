@@ -3,6 +3,7 @@ package video
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -20,14 +21,14 @@ type VideoInfo struct {
 // Must be same frame rate and frame count as frames must align for comparisons
 // Frame rate will be normalised to reference's to enforce CFR
 // Resolution and pixel format also normalised to reference's
-func SameVideoInfo(refPath, disPath string) (bool, VideoInfo, error) {
+func SameVideoInfo(logger *log.Logger, refPath, disPath string) (bool, VideoInfo, error) {
 	// Get video information
-	refInfo, err := GetVideoInfo(refPath)
+	refInfo, err := getVideoInfo(logger, refPath)
 	if err != nil {
 		return false, VideoInfo{}, err
 	}
 
-	disInfo, err := GetVideoInfo(disPath)
+	disInfo, err := getVideoInfo(logger, disPath)
 	if err != nil {
 		return false, VideoInfo{}, err
 	}
@@ -56,7 +57,7 @@ func SameVideoInfo(refPath, disPath string) (bool, VideoInfo, error) {
 }
 
 // Get information of video
-func GetVideoInfo(path string) (VideoInfo, error) {
+func getVideoInfo(logger *log.Logger, path string) (VideoInfo, error) {
 	// Local struct to hold ffprobe output
 	type ffprobeOut struct {
 		Streams []VideoInfo `json:"streams"`
@@ -104,6 +105,9 @@ func GetVideoInfo(path string) (VideoInfo, error) {
 	// Ensure frame count exists
 	i, err := strconv.Atoi(res.Streams[0].FrameCount)
 	if err != nil || i == 0 {
+		// Log fallback
+		logger.Printf("INFO: Failed to get frame count of \"%s\". Falling back to FFprobe frame counting", path)
+
 		// Fallback to counting frames directly
 		cmd = exec.Command(
 			"ffprobe",

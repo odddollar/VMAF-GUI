@@ -12,11 +12,17 @@ func (u *Ui) showError(err error, fatal bool) {
 	fyne.Do(func() {
 		d := dialog.NewError(err, u.w)
 
-		// Close window if error fatal
 		if fatal {
+			// Close window if error fatal
 			d.SetOnClosed(func() {
 				u.a.Quit()
 			})
+
+			// Log fatal error
+			u.logger.Printf("FATAL: %v", err)
+		} else {
+			// Log regular error
+			u.logger.Printf("ERROR: %v", err)
 		}
 
 		d.Show()

@@ -20,8 +20,11 @@ func (u *Ui) run() {
 	u.showStopButton()
 	u.resetState()
 
+	// Log checking video info
+	u.logger.Printf("INFO: Comparing video properties of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
+
 	// Ensure matching video info
-	same, refInfo, err := video.SameVideoInfo(refPath, disPath)
+	same, refInfo, err := video.SameVideoInfo(u.logger, refPath, disPath)
 	if !same || err != nil {
 		u.showErrorAndReset(err, false)
 		return
@@ -49,6 +52,9 @@ func (u *Ui) run() {
 		}
 		u.w.Close()
 	})
+
+	// Log starting
+	u.logger.Printf("INFO: Starting calculation with \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
 
 	// Start vmaf with channels
 	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, refPath, disPath, u.modelDropdown.Selected, u.refInfo)
@@ -91,6 +97,10 @@ func (u *Ui) run() {
 				u.enableBottomWidgets()
 				u.showStartButton()
 
+				// Log success
+				u.logger.Printf("INFO: Successfully calculated VMAF of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
+				u.logger.Printf("INFO: Parsing contents of \"vmaf.json\"")
+
 				// Parse vmaf results and store
 				vmaf, err := video.ParseJsonOutput("vmaf.json", u.deleteOutputCheck.Checked)
 				if err != nil {
@@ -98,6 +108,9 @@ func (u *Ui) run() {
 					return
 				}
 				u.vmafScores = vmaf
+
+				// Log updating results
+				u.logger.Printf("INFO: Updating VMAF results and graph")
 
 				fyne.Do(func() {
 					// Update results
