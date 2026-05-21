@@ -6,6 +6,8 @@ import (
 	"context"
 	"fmt"
 	"image"
+	"log"
+	"os"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -18,6 +20,9 @@ import (
 )
 
 type Ui struct {
+	// Logger of errors and progress
+	logger *log.Logger
+
 	// Main app elements
 	a fyne.App
 	w fyne.Window
@@ -316,18 +321,32 @@ func (u *Ui) Run() {
 
 // Checks to ensure program can run properly
 func (u *Ui) startupChecks() {
+	// Create logger
+	logFile, err := os.OpenFile("vmaf-gui.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		u.showError(fmt.Errorf("unable to access log file"), true)
+		return
+	}
+	u.logger = log.New(logFile, "", log.Ldate|log.Ltime|log.Lshortfile)
+
+	// Check for ffmpeg
 	if !video.CommandAvailable("ffmpeg") {
 		u.showError(fmt.Errorf("unable to find FFmpeg"), true)
+		u.logger.Printf("FATAL: unable to find FFmpeg")
 		return
 	}
 
+	// Check for vmaf within ffmpeg
 	if !video.VMAFAvailable() {
 		u.showError(fmt.Errorf("unable to find VMAF in FFmpeg"), true)
+		u.logger.Printf("FATAL: unable to find VMAF in FFmpeg")
 		return
 	}
 
+	// Check for ffprobe
 	if !video.CommandAvailable("ffprobe") {
 		u.showError(fmt.Errorf("unable to find FFprobe"), true)
+		u.logger.Printf("FATAL: unable to find FFprobe")
 		return
 	}
 }
