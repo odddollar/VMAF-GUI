@@ -10,7 +10,7 @@ import (
 )
 
 // Show dialog for selecting file
-func (u *Ui) selectFile(target *widget.Entry) {
+func (u *Ui) selectFile(title string, target *widget.Entry) {
 	d := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 		if err != nil {
 			u.logger.Printf("ERROR: %v", err)
@@ -49,7 +49,7 @@ func (u *Ui) selectFile(target *widget.Entry) {
 		}
 	}
 
-	d.SetTitleText("Select video file")
+	d.SetTitleText(title)
 	d.SetConfirmText("Select")
 	d.SetView(dialog.ListView)
 	d.Show()

@@ -138,8 +138,8 @@ func (u *Ui) NewUI() {
 	}
 
 	// Create file explore buttons
-	u.referenceButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile(u.referenceEntry) })
-	u.distortedButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile(u.distortedEntry) })
+	u.referenceButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile("Select reference file", u.referenceEntry) })
+	u.distortedButton = widget.NewButtonWithIcon("Browse", theme.SearchIcon(), func() { u.selectFile("Select distorted file", u.distortedEntry) })
 
 	// Create model selection dropdown
 	u.modelDropdown = widget.NewSelect([]string{
