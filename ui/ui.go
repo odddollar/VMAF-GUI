@@ -331,18 +331,21 @@ func (u *Ui) startupChecks() {
 
 	// Check for ffmpeg
 	if !video.CommandAvailable("ffmpeg") {
+		u.logger.Printf("FATAL: unable to find FFmpeg")
 		u.showError(fmt.Errorf("unable to find FFmpeg"), true)
 		return
 	}
 
 	// Check for vmaf within ffmpeg
 	if !video.VMAFAvailable() {
+		u.logger.Printf("FATAL: unable to find VMAF in FFmpeg")
 		u.showError(fmt.Errorf("unable to find VMAF in FFmpeg"), true)
 		return
 	}
 
 	// Check for ffprobe
 	if !video.CommandAvailable("ffprobe") {
+		u.logger.Printf("FATAL: unable to find FFprobe")
 		u.showError(fmt.Errorf("unable to find FFprobe"), true)
 		return
 	}

@@ -26,14 +26,19 @@ func (u *Ui) run() {
 	// Ensure matching video info
 	same, refInfo, err := video.SameVideoInfo(u.logger, refPath, disPath)
 	if !same || err != nil {
+		u.logger.Printf("ERROR: %v", err)
 		u.showErrorAndReset(err, false)
 		return
 	}
+
+	// Log comparison success
+	u.logger.Printf("INFO: successfully compared video properties of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
 
 	// Get reference info to update progress bar maximum
 	u.refInfo = refInfo
 	frameCount, err := strconv.ParseFloat(u.refInfo.FrameCount, 64)
 	if err != nil {
+		u.logger.Printf("ERROR: %v", err)
 		u.showErrorAndReset(err, false)
 		return
 	}
@@ -54,11 +59,12 @@ func (u *Ui) run() {
 	})
 
 	// Log starting
-	u.logger.Printf("INFO: starting calculation with \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
+	u.logger.Printf("INFO: starting calculation of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
 
 	// Start vmaf with channels
 	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, refPath, disPath, u.modelDropdown.Selected, u.refInfo)
 	if err != nil {
+		u.logger.Printf("ERROR: %v", err)
 		u.showErrorAndReset(err, false)
 		return
 	}
@@ -83,6 +89,7 @@ func (u *Ui) run() {
 				u.progressElapsedBinding.Set(progress.Elapsed.String())
 
 			case err := <-errChan: // Handle errors
+				u.logger.Printf("ERROR: %v", err)
 				u.showErrorAndReset(err, false)
 
 				// Cancel vmaf calculation
@@ -104,6 +111,7 @@ func (u *Ui) run() {
 				// Parse vmaf results and store
 				vmaf, err := video.ParseJsonOutput("vmaf.json", u.deleteOutputCheck.Checked)
 				if err != nil {
+					u.logger.Printf("ERROR: %v", err)
 					u.showErrorAndReset(err, false)
 					return
 				}

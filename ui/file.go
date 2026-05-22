@@ -13,6 +13,7 @@ import (
 func (u *Ui) selectFile(target *widget.Entry) {
 	d := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 		if err != nil {
+			u.logger.Printf("ERROR: %v", err)
 			u.showError(err, false)
 			return
 		}

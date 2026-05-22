@@ -31,7 +31,7 @@ func (u *Ui) compareImageUpdateIndex(index int) {
 	reqId := u.compareRequestId
 
 	// Log getting frames
-	u.logger.Printf("INFO: getting frame %d from \"%s\" (reference) and \"%s\" (distorted)", index+1, refPath, disPath)
+	u.logger.Printf("INFO: getting frame %d of \"%s\" (reference) and \"%s\" (distorted)", index+1, refPath, disPath)
 
 	go func() {
 		// Get frames
@@ -47,6 +47,7 @@ func (u *Ui) compareImageUpdateIndex(index int) {
 			if errors.Is(err, context.Canceled) {
 				return
 			}
+			u.logger.Printf("ERROR: %v", err)
 			u.showError(err, false)
 			return
 		}
