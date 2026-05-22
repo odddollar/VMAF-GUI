@@ -59,7 +59,7 @@ func (u *Ui) run() {
 	})
 
 	// Log starting
-	u.logger.Printf("INFO: starting calculation of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
+	u.logger.Printf("INFO: starting VMAF calculation of \"%s\" (reference) and \"%s\" (distorted)", refPath, disPath)
 
 	// Start vmaf with channels
 	progressChan, errChan, doneChan, err := video.RunVMAF(ctx, refPath, disPath, u.modelDropdown.Selected, u.refInfo)
@@ -118,7 +118,13 @@ func (u *Ui) run() {
 				u.vmafScores = vmaf
 
 				// Log updating results
-				u.logger.Printf("INFO: updating VMAF results and graph")
+				u.logger.Printf(
+					"INFO: updating VMAF results and graph. Mean: %.2f, harmonic mean: %.2f, min: %.2f, max: %.2f",
+					u.vmafScores.PooledMetrics.VMAF.Mean,
+					u.vmafScores.PooledMetrics.VMAF.HarmonicMean,
+					u.vmafScores.PooledMetrics.VMAF.Min,
+					u.vmafScores.PooledMetrics.VMAF.Max,
+				)
 
 				fyne.Do(func() {
 					// Update results
