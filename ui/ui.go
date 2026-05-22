@@ -284,7 +284,12 @@ func (u *Ui) NewUI() {
 	// Create entry that only allows digits
 	u.compareFrameEntry = widget.NewEntry()
 	u.compareFrameEntry.SetText("1")
-	u.compareFrameEntry.OnChanged = u.compareFrameEntryRestrict
+	u.compareFrameEntry.OnChanged = func(s string) {
+		if u.compareFrameEntry.Disabled() {
+			return
+		}
+		u.compareFrameEntryRestrict(s)
+	}
 
 	// Create dynamic label for max frame number
 	u.compareFrameLabel = widget.NewLabelWithData(binding.NewSprintf(
