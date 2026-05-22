@@ -67,12 +67,14 @@ type Ui struct {
 	resultsFrameCountLabels *fyne.Container
 
 	// Compare tab elements
-	compareResultsLabel *widget.Label
-	compareImages       *widgets.CompareWidget
-	comparePrevButton   *widget.Button
-	compareNextButton   *widget.Button
-	compareFrameEntry   *widget.Entry
-	compareFrameLabel   *widget.Label
+	compareReferenceLabel *widget.Label
+	compareDistortedLabel *widget.Label
+	compareResultsLabel   *widget.Label
+	compareImages         *widgets.CompareWidget
+	comparePrevButton     *widget.Button
+	compareNextButton     *widget.Button
+	compareFrameEntry     *widget.Entry
+	compareFrameLabel     *widget.Label
 
 	// Allows cancelling in-progress vmaf calculation
 	vmafCancel context.CancelFunc
@@ -251,6 +253,18 @@ func (u *Ui) NewUI() {
 		u.resultsGraph,
 	)
 
+	// Create reference and distorted labels
+	u.compareReferenceLabel = widget.NewLabelWithStyle(
+		"Reference",
+		fyne.TextAlignLeading,
+		fyne.TextStyle{Bold: true},
+	)
+	u.compareDistortedLabel = widget.NewLabelWithStyle(
+		"Distorted",
+		fyne.TextAlignTrailing,
+		fyne.TextStyle{Bold: true},
+	)
+
 	// Create compare vmaf label
 	compareVmafText := binding.NewSprintf(
 		"Frame VMAF: %.2f",
@@ -258,6 +272,7 @@ func (u *Ui) NewUI() {
 	)
 	u.compareResultsLabel = widget.NewLabelWithData(compareVmafText)
 	u.compareResultsLabel.TextStyle.Monospace = true
+	u.compareResultsLabel.Alignment = fyne.TextAlignCenter
 
 	// Create compare image widget
 	u.compareImages = widgets.NewCompareWidget(image.Black, image.Black)
@@ -280,10 +295,11 @@ func (u *Ui) NewUI() {
 
 	// Compare tab elements
 	compareTabElements := container.NewBorder(
-		container.NewHBox(
-			layout.NewSpacer(),
+		container.NewGridWithColumns(
+			3,
+			u.compareReferenceLabel,
 			u.compareResultsLabel,
-			layout.NewSpacer(),
+			u.compareDistortedLabel,
 		),
 		container.NewCenter(container.NewHBox(
 			u.comparePrevButton,
